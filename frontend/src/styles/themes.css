@@ -8,11 +8,11 @@
   --matcha-light: #E8F5E8;
   
   /* Performative Theme (Concerts) */
-  --performative-primary: #8B0000;
-  --performative-secondary: #FF1493;
-  --performative-dark: #36454F;
-  --performative-accent: #DC143C;
-  --performative-light: #FFF0F5;
+  --performative-primary: #6B0020;
+  --performative-secondary: #B8589C;
+  --performative-dark: #2A2A3A;
+  --performative-accent: #9C3060;
+  --performative-light: #F5E5ED;
   
   /* Common Colors */
   --white: #FFFFFF;
@@ -45,7 +45,7 @@ body.theme-matcha {
 }
 
 body.theme-performative {
-  background: linear-gradient(135deg, var(--performative-light) 0%, var(--performative-secondary) 20%, var(--performative-dark) 100%);
+  background: linear-gradient(135deg, #3A3A4A 0%, #4A3545 40%, #2A2A3A 100%);
   color: var(--white);
 }
 

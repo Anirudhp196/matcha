@@ -8,11 +8,11 @@
     56%,
     100% {
         text-shadow:
-            0 0 5px #ff00c8,
-            0 0 10px #ff00c8,
-            0 0 20px #ff00c8,
-            0 0 40px #ff00c8,
-            0 0 80px #ff00c8;
+            0 0 3px #9C3060,
+            0 0 6px #9C3060,
+            0 0 12px #9C3060,
+            0 0 24px #9C3060,
+            0 0 48px #9C3060;
         opacity: 1;
     }
 
@@ -26,6 +26,6 @@
 
 .neon-flicker {
     font-size: 2rem;
-    color: #ff00c8;
+    color: #B8589C;
     animation: neonFlicker 3s infinite;
 }

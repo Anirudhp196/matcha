@@ -64,8 +64,8 @@ body {
 }
 
 .glow-text {
-    color: #ff0090;
-    text-shadow: 0 0 6px #ff0090, 0 0 10px #ff0090;
+    color: #B8589C;
+    text-shadow: 0 0 4px #B8589C, 0 0 8px #B8589C;
     transition: all 0.5s ease;
 }
 
@@ -87,19 +87,19 @@ body {
     max-width: 1400px;
     margin: 0 auto;
     padding: 1rem;
-    border: 2px solid #ff00c8;
+    border: 2px solid #9C3060;
     border-radius: 16px;
-    box-shadow: 0 0 15px rgba(255, 0, 200, 0.4);
+    box-shadow: 0 0 10px rgba(156, 48, 96, 0.3);
     background-color: rgba(0, 0, 0, 0.3);
 }
 
 .event-card {
     position: relative; /* Added to contain the absolute banner */
-    border: 2px solid #ff0090;
+    border: 2px solid #9C3060;
     background: rgba(255, 255, 255, 0.03);
     padding: 1.5rem;
     border-radius: 12px;
-    box-shadow: 0 0 12px #ff0090;
+    box-shadow: 0 0 8px #9C3060;
     transition: transform 0.2s;
     display: flex; /* Ensure consistent layout */
     flex-direction: column; /* Ensure consistent layout */
@@ -107,7 +107,7 @@ body {
 
 .event-card:hover {
     transform: scale(1.03);
-    box-shadow: 0 0 16px #ff00c8;
+    box-shadow: 0 0 12px #B8589C;
 }
 
 .event-card h2 {
