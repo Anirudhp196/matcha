@@ -12,7 +12,7 @@ import GoldRequirementSetter from "../components/GoldRequirementSetter";
 const ManageConcerts = () => {
   const { events, loading, refetch } = useEvents();
   const [myEvents, setMyEvents] = useState([]);
-  const { address, eventContract, artistName, goldRequirement } = useWeb3();
+  const { address, eventContract, getDisplayName, goldRequirement } = useWeb3();
   const { theme } = useTheme();
   const [cancellingEventId, setCancellingEventId] = useState(null);
   const [isCancelling, setIsCancelling] = useState(false);

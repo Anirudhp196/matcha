@@ -22,7 +22,7 @@ describe("EventManager & Ticket (Event Lifecycle)", function () {
     buyerOne = new ethers.Wallet(process.env.BUYER_ONE_PRIVATE_KEY, provider);
     buyerTwo = new ethers.Wallet(process.env.BUYER_TWO_PRIVATE_KEY, provider);
 
-    console.log("\n🔍 ETH Balances:");
+    console.log("\n🔍 CHZ Balances:");
     console.log(
       `BuyerOne   (${buyerOne.address}): ${ethers.formatEther(
         await provider.getBalance(buyerOne.address)

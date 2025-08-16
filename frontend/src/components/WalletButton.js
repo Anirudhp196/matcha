@@ -1,9 +1,8 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useWeb3 } from "../contexts/Web3Context";
+import { useEns } from "../hooks/useEns";
 import LoadingSpinner from "./LoadingSpinner";
 import "./WalletButton.css";
-
-const shorten = (addr) => addr.slice(0, 6) + "..." + addr.slice(-4);
 
 const WalletButton = () => {
   const {
@@ -13,7 +12,12 @@ const WalletButton = () => {
     isConnected,
     isConnecting,
     user, // Privy user info
+    ensName,
+    ensAvatar,
+    getDisplayName,
   } = useWeb3();
+
+  const { shortenAddress } = useEns();
 
   return (
     <div className="wallet-button-container">
@@ -34,9 +38,24 @@ const WalletButton = () => {
         </button>
       ) : (
         <div className="connected-info">
+          {ensAvatar && (
+            <img 
+              src={ensAvatar} 
+              alt="ENS Avatar" 
+              className="ens-avatar"
+              onError={(e) => {
+                e.target.style.display = 'none';
+              }}
+            />
+          )}
           <span className="wallet-address">
-            {user?.email?.address || shorten(address)}
+            {getDisplayName()}
           </span>
+          {ensName && (
+            <span className="ens-indicator" title={`ENS: ${ensName} | Address: ${shortenAddress(address)}`}>
+              🔗
+            </span>
+          )}
           <button className="disconnect-button" onClick={disconnectWallet}>
             ✖ Disconnect
           </button>

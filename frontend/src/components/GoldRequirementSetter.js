@@ -5,7 +5,7 @@ import LoadingSpinner from "./LoadingSpinner";
 import "./GoldRequirementSetter.css";
 
 const GoldRequirementSetter = () => {
-  const { goldRequirement, setGoldRequirement, role, address, artistName, eventContract } = useWeb3();
+  const { goldRequirement, setGoldRequirement, role, address, eventContract } = useWeb3();
   const [inputValue, setInputValue] = useState(goldRequirement || 0);
   const [isUpdating, setIsUpdating] = useState(false);
 

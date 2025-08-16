@@ -21,26 +21,26 @@ describe("EventManager - Permissions & Cancellation Flow", function () {
     buyerOne = new ethers.Wallet(process.env.BUYER_ONE_PRIVATE_KEY, provider);
     buyerTwo = new ethers.Wallet(process.env.BUYER_TWO_PRIVATE_KEY, provider);
 
-    console.log("\n🔍 ETH Balances:");
+    console.log("\n🔍 CHZ Balances:");
     console.log(
       `BuyerOne   (${buyerOne.address}): ${ethers.formatEther(
         await provider.getBalance(buyerOne.address)
-      )} ETH`
+      )} CHZ`
     );
     console.log(
       `BuyerTwo   (${buyerTwo.address}): ${ethers.formatEther(
         await provider.getBalance(buyerTwo.address)
-      )} ETH`
+      )} CHZ`
     );
     console.log(
       `Organizer  (${organizer.address}): ${ethers.formatEther(
         await provider.getBalance(organizer.address)
-      )} ETH`
+      )} CHZ`
     );
     console.log(
       `Owner      (${owner.address}): ${ethers.formatEther(
         await provider.getBalance(owner.address)
-      )} ETH`
+      )} CHZ`
     );
 
     const eventManagerArtifact = await hre.artifacts.readArtifact(
@@ -125,7 +125,7 @@ describe("EventManager - Permissions & Cancellation Flow", function () {
     console.log(
       `📜 Event details: Metadata URI: ${
         evt.metadataURI
-      }, Ticket Price: ${ethers.formatEther(evt.ticketPrice)} ETH`
+      }, Ticket Price: ${ethers.formatEther(evt.ticketPrice)} CHZ`
     );
 
     expect(evt.metadataURI).to.equal(newURI);

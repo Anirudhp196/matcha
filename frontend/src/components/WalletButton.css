@@ -56,13 +56,60 @@
     background: rgba(0, 255, 231, 0.1);
     border: 1px solid #00ffe7;
     border-radius: 6px;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.wallet-address:hover {
+    background: rgba(0, 255, 231, 0.2);
+    box-shadow: 0 0 8px rgba(0, 255, 231, 0.3);
 }
 
 .connected-info {
     display: flex;
     align-items: center;
+    gap: 0.5rem;
 }
 
 .connect-text {
     margin-left: 0.25rem;
+}
+
+/* ENS-related styles */
+.ens-loading {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.8rem;
+    opacity: 0.8;
+}
+
+.ens-loading span {
+    white-space: nowrap;
+}
+
+.ens-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #00ffe7;
+    box-shadow: 0 0 8px rgba(0, 255, 231, 0.3);
+    transition: all 0.2s ease;
+}
+
+.ens-avatar:hover {
+    box-shadow: 0 0 12px rgba(0, 255, 231, 0.5);
+    transform: scale(1.1);
+}
+
+.ens-indicator {
+    font-size: 0.9rem;
+    opacity: 0.7;
+    cursor: help;
+    transition: opacity 0.2s ease;
+}
+
+.ens-indicator:hover {
+    opacity: 1;
 }

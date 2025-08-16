@@ -2,7 +2,20 @@ const { ethers } = require("ethers");
 require("dotenv").config();
 
 // Default to mainnet for ENS resolution, can be parameterized if needed
-const provider = new ethers.JsonRpcProvider(process.env.ENS_RPC_URL || "https://mainnet.infura.io/v3/" + process.env.INFURA_KEY);
+// Use Infura if key is provided, otherwise use a public endpoint for testing
+const rpcUrl = process.env.INFURA_KEY 
+  ? `https://mainnet.infura.io/v3/${process.env.INFURA_KEY}`
+  : "https://rpc.ankr.com/eth"; // Public RPC endpoint
+
+// Handle both ethers v5 and v6 syntax
+let provider;
+try {
+  // Try ethers v6 syntax first
+  provider = new ethers.JsonRpcProvider(rpcUrl);
+} catch (error) {
+  // Fallback to ethers v5 syntax
+  provider = new ethers.providers.JsonRpcProvider(rpcUrl);
+}
 
 /**
  * Resolves the ENS name for a given Ethereum address, and verifies it resolves back to the address.
@@ -48,7 +61,17 @@ async function getENSProfile(address) {
     resolver.getText("com.github"),
   ]);
 
-  return { address, name, avatar, description, url, twitter, github };
+  // Process avatar URL to handle IPFS and other formats
+  let processedAvatar = avatar;
+  if (avatar) {
+    if (avatar.startsWith('ipfs://')) {
+      processedAvatar = avatar.replace('ipfs://', 'https://ipfs.io/ipfs/');
+    } else if (avatar.startsWith('ipfs/')) {
+      processedAvatar = `https://ipfs.io/ipfs/${avatar.slice(5)}`;
+    }
+  }
+
+  return { address, name, avatar: processedAvatar, description, url, twitter, github };
 }
 
 module.exports = { getENSName, getENSProfile }; 

@@ -1,10 +1,10 @@
 // Refund Tracker Utility
 import { ethers } from "ethers";
-import EventManagerJSON from "../abis/EventManager.json"; // Adjust path if needed
+import { CONTRACTS } from "../contracts/config";
 
-// 📍 Replace this with your deployed contract address
-const EVENT_MANAGER_ADDRESS = EventManagerJSON.address;
-const EVENT_MANAGER_ABI = EventManagerJSON.abi;
+// Use dynamic contract configuration
+const EVENT_MANAGER_ADDRESS = CONTRACTS.EventManager.address;
+const EVENT_MANAGER_ABI = CONTRACTS.EventManager.abi;
 
 export async function trackRefunds(eventId, provider) {
   if (!provider) {
@@ -30,7 +30,7 @@ export async function trackRefunds(eventId, provider) {
       const etherValue = ethers.utils.formatEther(refundAmount);
 
       console.log(`👤 Buyer: ${buyer}`);
-      console.log(`   💰 Refund owed: ${etherValue} ETH`);
+      console.log(`   💰 Refund owed: ${etherValue} CHZ`);
       console.log(`   🔍 ${etherValue === "0.0" ? "✅ Refunded" : "❌ Not refunded"}\n`);
     }
 

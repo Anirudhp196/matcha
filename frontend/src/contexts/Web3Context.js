@@ -1,10 +1,8 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { ethers } from "ethers";
 import { usePrivy, useWallets } from "@privy-io/react-auth";
-import Ticket from "../abis/Ticket.json";
-import EventManager from "../abis/EventManager.json";
-import Marketplace from "../abis/Marketplace.json";
-import ArtistRegistrationForm from "../components/ArtistRegistrationForm";
+import { CONTRACTS } from "../contracts/config";
+import { useEns } from "../hooks/useEns";
 import RoleSelector from "../components/RoleSelector";
 import LoadingSpinner from "../components/LoadingSpinner";
 import axios from "axios";
@@ -15,6 +13,7 @@ const Web3Context = createContext();
 export const Web3Provider = ({ children }) => {
   const { ready, authenticated, login, logout, user } = usePrivy();
   const { wallets } = useWallets();
+  const { lookupName, lookupProfile, shortenAddress } = useEns();
 
   const [provider, setProvider] = useState(null);
   const [signer, setSigner] = useState(null);
@@ -24,10 +23,10 @@ export const Web3Provider = ({ children }) => {
   const [marketplaceContract, setMarketplaceContract] = useState(null);
   const [network, setNetwork] = useState(null);
   const [role, setRole] = useState(null);
-  const [showArtistForm, setShowArtistForm] = useState(false);
   const [showRoleSelector, setShowRoleSelector] = useState(false);
   const [tempUserAddress, setTempUserAddress] = useState(null);
-  const [artistName, setArtistName] = useState(null);
+  const [ensName, setEnsName] = useState(null);
+  const [ensAvatar, setEnsAvatar] = useState(null);
   const [goldRequirement, setGoldRequirement] = useState(0);
   const [artistProfiles, setArtistProfiles] = useState({});
   const [isConnecting, setIsConnecting] = useState(false);
@@ -37,6 +36,32 @@ export const Web3Provider = ({ children }) => {
   const PINATA_API_KEY = "3bf4164172fae7b68de3";
   const PINATA_SECRET =
     "32288745dd22dabdcc87653918e33841ccfcfbd45c43a89709f873aedcc7c9fe";
+
+  // Helper function to get display name (ENS name or shortened address)
+  const getDisplayName = () => {
+    if (user?.email?.address) return user.email.address;
+    if (ensName) return ensName;
+    if (address) return shortenAddress(address);
+    return "Unknown Artist";
+  };
+
+  // Lookup ENS name and avatar when address changes
+  useEffect(() => {
+    if (address) {
+      lookupProfile(address)
+        .then(profile => {
+          setEnsName(profile.ensName);
+          setEnsAvatar(profile.avatar);
+        })
+        .catch(() => {
+          setEnsName(null);
+          setEnsAvatar(null);
+        });
+    } else {
+      setEnsName(null);
+      setEnsAvatar(null);
+    }
+  }, [address, lookupProfile]);
 
   // Initialize Web3 when user is authenticated and has wallet
   useEffect(() => {
@@ -105,19 +130,19 @@ export const Web3Provider = ({ children }) => {
         // DEBUG: Log network and contract info
         console.log("=== DEBUG INFO ===");
         console.log("Connected to network:", _network.chainId, _network.name);
-        console.log("EventManager address:", EventManager.address);
-        console.log("Ticket address:", Ticket.address);
-        console.log("Marketplace address:", Marketplace.address);
+        console.log("EventManager address:", CONTRACTS.EventManager.address);
+        console.log("Ticket address:", CONTRACTS.Ticket.address);
+        console.log("Marketplace address:", CONTRACTS.Marketplace.address);
         console.log("User address:", _address);
 
         // Try to check if contract exists
         try {
-          const code = await ethersProvider.getCode(EventManager.address);
+          const code = await ethersProvider.getCode(CONTRACTS.EventManager.address);
           console.log("Contract code exists:", code !== "0x");
           if (code === "0x") {
             console.log(
               "⚠️ Contract not found at",
-              EventManager.address,
+              CONTRACTS.EventManager.address,
               "on network",
               _network.chainId
             );
@@ -127,18 +152,18 @@ export const Web3Provider = ({ children }) => {
         }
 
         const _ticket = new ethers.Contract(
-          Ticket.address,
-          Ticket.abi,
+          CONTRACTS.Ticket.address,
+          CONTRACTS.Ticket.abi,
           ethersSigner
         );
         const _event = new ethers.Contract(
-          EventManager.address,
-          EventManager.abi,
+          CONTRACTS.EventManager.address,
+          CONTRACTS.EventManager.abi,
           ethersSigner
         );
         const _marketplace = new ethers.Contract(
-          Marketplace.address,
-          Marketplace.abi,
+          CONTRACTS.Marketplace.address,
+          CONTRACTS.Marketplace.abi,
           ethersSigner
         );
 
@@ -158,13 +183,12 @@ export const Web3Provider = ({ children }) => {
             try {
               setLoadingMessage("Loading artist profile...");
               const profile = await fetchArtistProfile(_address, _event);
-              if (profile) {
-                setArtistName(profile.name);
+              if (profile && profile.goldRequirement !== undefined) {
                 setGoldRequirement(profile.goldRequirement);
               }
             } catch (err) {
               console.error("Failed to load artist profile:", err);
-              setShowArtistForm(true);
+              // No need to show artist form anymore - we use wallet/ENS name
             }
           }
         } else {
@@ -202,17 +226,17 @@ export const Web3Provider = ({ children }) => {
       await logout();
       // Clear all state
       setProvider(null);
-      setSigner(null);
-      setAddress(null);
-      setNetwork(null);
-      setTicketContract(null);
-      setEventContract(null);
-      setMarketplaceContract(null);
-      setRole(null);
-      setArtistName(null);
-      setGoldRequirement(0);
-      setShowRoleSelector(false);
-      setShowArtistForm(false);
+              setSigner(null);
+        setAddress(null);
+        setNetwork(null);
+        setTicketContract(null);
+        setEventContract(null);
+        setMarketplaceContract(null);
+        setRole(null);
+        setEnsName(null);
+        setEnsAvatar(null);
+        setGoldRequirement(0);
+        setShowRoleSelector(false);
     } catch (error) {
       console.error("Logout failed:", error);
     }
@@ -297,61 +321,22 @@ export const Web3Provider = ({ children }) => {
     }
   };
 
-  const completeArtistRegistration = async (name, goldReq) => {
-    if (!address || !eventContract) return;
-    try {
-      setIsLoading(true);
-      setLoadingMessage("Registering artist...");
-      const tx = await eventContract.registerAsMusician();
-      await tx.wait();
 
-      setArtistName(name);
-      setGoldRequirement(goldReq);
-      setRole("musician");
-      localStorage.setItem(`mosh-role-${address}`, "musician");
-      localStorage.setItem(`mosh-gold-req-${address}`, goldReq.toString());
-
-      setArtistProfiles((prev) => ({
-        ...prev,
-        [address]: { name, goldRequirement: goldReq },
-      }));
-
-      setShowArtistForm(false);
-      toast.success(`Welcome, ${name}!`);
-    } catch (err) {
-      console.error("Registration failed:", err);
-      toast.error("Registration failed.");
-    } finally {
-      setIsLoading(false);
-      setLoadingMessage("");
-    }
-  };
 
   const updateGoldRequirement = (value) => {
     setGoldRequirement(value);
-    if (address && artistName) {
+    if (address) {
       setArtistProfiles((prev) => ({
         ...prev,
-        [address]: { ...prev[address], goldRequirement: value },
+        [address]: { ...prev[address], name: getDisplayName(), goldRequirement: value },
       }));
       localStorage.setItem(`mosh-gold-req-${address}`, value.toString());
     }
   };
 
-  const handleSelectFan = () => {
-    if (tempUserAddress) {
-      setRole("fan");
-      localStorage.setItem(`mosh-role-${tempUserAddress}`, "fan");
-      setShowRoleSelector(false);
-    }
-  };
 
-  const handleSelectArtist = () => {
-    if (tempUserAddress) {
-      setShowRoleSelector(false);
-      setShowArtistForm(true);
-    }
-  };
+
+
 
   // Load saved gold requirement
   useEffect(() => {
@@ -360,18 +345,17 @@ export const Web3Provider = ({ children }) => {
       const parsed = parseInt(saved);
       if (!isNaN(parsed)) {
         setGoldRequirement(parsed);
-        if (artistName) {
-          setArtistProfiles((prev) => ({
-            ...prev,
-            [address]: {
-              ...prev[address],
-              goldRequirement: parsed,
-            },
-          }));
-        }
+        setArtistProfiles((prev) => ({
+          ...prev,
+          [address]: {
+            ...prev[address],
+            name: getDisplayName(),
+            goldRequirement: parsed,
+          },
+        }));
       }
     }
-  }, [address, role, artistName]);
+  }, [address, role, ensName]);
 
   // Show loading while Privy initializes
   if (!ready || isConnecting || isLoading) {
@@ -379,19 +363,40 @@ export const Web3Provider = ({ children }) => {
   }
 
   if (showRoleSelector) {
+    const handleSelectFan = () => {
+      setRole("fan");
+      localStorage.setItem(`mosh-role-${address}`, "fan");
+      setShowRoleSelector(false);
+      toast.success("Welcome, fan!");
+    };
+
+    const handleSelectArtist = async () => {
+      if (!address || !eventContract) return;
+      try {
+        setIsLoading(true);
+        setLoadingMessage("Registering as musician...");
+        
+        const tx = await eventContract.registerAsMusician();
+        await tx.wait();
+
+        setRole("musician");
+        localStorage.setItem(`mosh-role-${address}`, "musician");
+        setShowRoleSelector(false);
+        toast.success(`Welcome, ${getDisplayName()}!`);
+      } catch (err) {
+        console.error("Registration failed:", err);
+        toast.error("Registration failed.");
+      } finally {
+        setIsLoading(false);
+        setLoadingMessage("");
+      }
+    };
+
     return (
       <RoleSelector
         onSelectFan={handleSelectFan}
         onSelectArtist={handleSelectArtist}
       />
-    );
-  }
-
-  if (showArtistForm) {
-    return (
-      <div className="artist-form-overlay">
-        <ArtistRegistrationForm onComplete={completeArtistRegistration} />
-      </div>
     );
   }
 
@@ -409,7 +414,10 @@ export const Web3Provider = ({ children }) => {
         marketplaceContract,
         isConnected: authenticated && !!signer,
         role,
-        artistName,
+        artistName: getDisplayName(), // For backward compatibility
+        getDisplayName,
+        ensName,
+        ensAvatar,
         goldRequirement,
         setGoldRequirement: updateGoldRequirement,
         getArtistName,
