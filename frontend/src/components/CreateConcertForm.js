@@ -12,6 +12,8 @@ const PINATA_SECRET = "32288745dd22dabdcc87653918e33841ccfcfbd45c43a89709f873aed
 
 const CreateConcertForm = ({ onCreated }) => {
   const { eventContract, address, goldRequirement, getDisplayName } = useWeb3();
+  const { theme } = useTheme();
+  const isMatcha = theme === 'matcha';
   const [form, setForm] = useState({
     name: "",
     description: "",
