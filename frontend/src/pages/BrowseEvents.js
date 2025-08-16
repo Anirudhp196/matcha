@@ -5,6 +5,7 @@ import { useTheme } from "../contexts/ThemeContext";
 import { toast } from "react-hot-toast";
 import EventCard from "../components/EventCard";
 import LoadingSpinner from "../components/LoadingSpinner";
+import { MatchaIcon, MusicPerformanceIcon, TicketIcon } from "../components/Icons";
 import "./BrowseEvents.css";
 
 const BrowseEvents = () => {
@@ -91,12 +92,12 @@ const BrowseEvents = () => {
   return (
     <div className={`browse-events-container theme-${theme}`}>
       <h1 className={`page-title ${isMatcha ? 'matcha' : 'performative'}`}>
-        {isMatcha ? '⚽ Upcoming Matches' : '🎸 Upcoming Concerts'}
+        {isMatcha ? <><MatchaIcon size={32} /> Upcoming Matches</> : <><MusicPerformanceIcon size={32} /> Upcoming Concerts</>}
       </h1>
       
       {isGuestUser ? (
         <div className={`guest-banner ${isMatcha ? 'matcha' : 'performative'}`}>
-          <p>Connect your wallet to buy tickets and access exclusive features! 🎟️</p>
+          <p>Connect your wallet to buy tickets and access exclusive features! <TicketIcon size={20} /></p>
         </div>
       ) : loading ? (
         <div className="loading-events">

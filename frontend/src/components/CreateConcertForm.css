@@ -5,6 +5,21 @@
     padding: 0.5rem 2rem;
     background-color: #0f0f0f;
     font-family: "Share Tech Mono", monospace;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+}
+
+/* Matcha theme - blend with background */
+.concert-form.matcha-theme {
+    background-color: rgba(245, 245, 220, 0.15);
+    border: 1px solid rgba(156, 175, 136, 0.3);
+    box-shadow: 0 2px 8px rgba(45, 80, 22, 0.1);
+}
+
+/* Performative theme - keep dark */
+.concert-form.performative-theme {
+    background-color: #0f0f0f;
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .form-group {
@@ -14,28 +29,68 @@
 }
 
 .form-group label {
-    color: #00ffe7;
+    color: #9bb5b3;
     font-size: 0.9rem;
     margin-bottom: 0.2rem;
+    font-weight: 500;
+}
+
+.matcha-theme .form-group label {
+    color: #2D5016;
+    font-weight: 600;
+}
+
+.performative-theme .form-group label {
+    color: #9bb5b3;
+    font-weight: 500;
 }
 
 .concert-form input,
 .concert-form textarea {
     background: #1a1a1a;
-    border: 1px solid #00ffe7;
+    border: 1px solid #3a4a48;
     border-radius: 8px;
     padding: 0.75rem 1rem;
-    color: #d1f2ff;
+    color: #e8f0ef;
     font-size: 0.95rem;
     transition: 0.2s;
     resize: vertical;
 }
 
+/* Matcha theme inputs */
+.matcha-theme input,
+.matcha-theme textarea {
+    background: rgba(255, 255, 255, 0.4);
+    border: 1px solid rgba(156, 175, 136, 0.5);
+    color: #2D5016;
+}
+
+/* Performative theme inputs */
+.performative-theme input,
+.performative-theme textarea {
+    background: #1a1a1a;
+    border: 1px solid #3a4a48;
+    color: #e8f0ef;
+}
+
 .concert-form input:focus,
 .concert-form textarea:focus {
     outline: none;
-    border-color: #00ffe7;
-    box-shadow: 0 0 12px #00ffe7;
+    border-color: #5a7a76;
+    box-shadow: none;
+    background: #202020;
+}
+
+.matcha-theme input:focus,
+.matcha-theme textarea:focus {
+    border-color: rgba(156, 175, 136, 0.8);
+    background: rgba(255, 255, 255, 0.5);
+}
+
+.performative-theme input:focus,
+.performative-theme textarea:focus {
+    border-color: #5a7a76;
+    background: #202020;
 }
 
 .concert-form textarea {
@@ -55,46 +110,86 @@
 .concert-form input[type="file"] {
     background: none;
     border: none;
-    color: #00ffe7;
+    color: #9bb5b3;
     font-size: 0.9rem;
     cursor: pointer;
     padding-left: 0;
 }
 
 .concert-form input[type="file"]::file-selector-button {
-    background: #00ffe7;
+    background: #5a7a76;
     border: none;
-    color: #000;
-    font-weight: bold;
+    color: #ffffff;
+    font-weight: 600;
     padding: 0.5rem 1rem;
     border-radius: 6px;
     cursor: pointer;
     transition: all 0.2s ease;
-    box-shadow: 0 0 8px #00ffe7;
+    box-shadow: none;
+}
+
+.matcha-theme input[type="file"]::file-selector-button {
+    background: #9CAF88;
+    color: #2D5016;
+}
+
+.performative-theme input[type="file"]::file-selector-button {
+    background: #5a7a76;
+    color: #ffffff;
 }
 
 .concert-form input[type="file"]::file-selector-button:hover {
-    background: #00ffcc;
-    box-shadow: 0 0 16px #00ffe7, 0 0 24px #00ffe7;
+    background: #6b8b87;
+    box-shadow: none;
+}
+
+.matcha-theme input[type="file"]::file-selector-button:hover {
+    background: #8A9D78;
+}
+
+.performative-theme input[type="file"]::file-selector-button:hover {
+    background: #6b8b87;
 }
 
 .concert-form button {
-    background-color: #00ffe7;
-    color: #000;
-    font-weight: bold;
+    background-color: #5a7a76;
+    color: #ffffff;
+    font-weight: 600;
     font-size: 1rem;
     padding: 0.9rem;
     border: none;
     border-radius: 10px;
     cursor: pointer;
     transition: all 0.25s ease-in-out;
-    box-shadow: 0 0 12px #00ffe7;
+    box-shadow: none;
     margin-top: 0.5rem;
 }
 
+.matcha-theme button {
+    background-color: #9CAF88;
+    color: #2D5016;
+    font-weight: 700;
+}
+
+.performative-theme button {
+    background-color: #5a7a76;
+    color: #ffffff;
+}
+
 .concert-form button:hover {
-    background-color: #00ffcc;
-    box-shadow: 0 0 16px #00ffe7, 0 0 30px #00ffe7;
+    background-color: #6b8b87;
+    box-shadow: none;
+    transform: translateY(-1px);
+}
+
+.matcha-theme button:hover {
+    background-color: #8A9D78;
+    transform: translateY(-1px);
+}
+
+.performative-theme button:hover {
+    background-color: #6b8b87;
+    transform: translateY(-1px);
 }
 
 .concert-form button:disabled {
@@ -150,10 +245,11 @@
 }
 
 .upload-progress h3 {
-    color: #00ffe7;
+    color: #9bb5b3;
     margin: 1rem 0;
     font-size: 1.2rem;
-    text-shadow: 0 0 8px rgba(0, 255, 231, 0.8);
+    text-shadow: none;
+    font-weight: 500;
 }
 
 .upload-progress .progress-bar-container {

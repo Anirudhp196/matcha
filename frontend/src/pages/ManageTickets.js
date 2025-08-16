@@ -5,6 +5,7 @@ import { useTickets } from "../hooks/useTickets";
 import { ethers } from "ethers";
 import { toast } from "react-hot-toast";
 import LoadingSpinner from "../components/LoadingSpinner";
+import { TicketIcon } from "../components/Icons";
 import "./ManageTickets.css";
 import "../components/EventCard.css";
 
@@ -98,7 +99,7 @@ const ManageTickets = () => {
       await tx.wait();
 
       toast.dismiss();
-      toast.success("🎟️ Ticket listed!");
+      toast.success("Ticket listed!");
       await refetch();
     } catch (err) {
       console.error("List failed:", err);

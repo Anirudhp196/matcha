@@ -1,0 +1,45 @@
+/* Styles for icon components */
+.icon-inline {
+  display: inline-block;
+  vertical-align: middle;
+  margin-right: 4px;
+}
+
+/* Ensure SVG icons inherit text color */
+svg.icon-component {
+  fill: currentColor;
+  stroke: currentColor;
+}
+
+/* Dark theme support */
+.dark-theme svg.icon-component {
+  fill: currentColor;
+  stroke: currentColor;
+}
+
+/* Matcha theme specific colors */
+.theme-matcha svg.icon-component {
+  color: inherit;
+}
+
+/* Specific icon adjustments */
+.artist-name svg,
+.location-name svg,
+.date-name svg,
+.ticket-sold svg,
+.price-section svg {
+  margin-right: 6px;
+  vertical-align: text-bottom;
+}
+
+/* Button icon alignment */
+button svg {
+  margin-right: 4px;
+  vertical-align: middle;
+}
+
+/* Page title icon alignment */
+h1 svg, h2 svg {
+  margin-right: 8px;
+  vertical-align: middle;
+}

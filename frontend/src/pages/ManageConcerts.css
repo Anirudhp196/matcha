@@ -1,6 +1,18 @@
 .manage-concerts-container {
     padding: 2rem;
     text-align: center;
+    background-color: #F5F5F5;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Helvetica Neue", Arial, sans-serif;
+    color: #2D5016;
+    transition: all 0.5s ease;
+}
+
+.manage-concerts-container.theme-matcha {
+    background-color: #F5F5DC;
+    color: #2D5016;
+}
+
+.manage-concerts-container.theme-performative {
     background-color: #0b0b0b;
     font-family: "Share Tech Mono", monospace;
     color: #d1f2ff;
@@ -8,36 +20,83 @@
 
 .page-title {
     font-size: 2.5rem;
-    color: #00ffe7;
-    text-shadow: 0 0 6px #00ffe7, 0 0 12px #00ffe7, 0 0 20px #00ffe7;
     margin-bottom: 2rem;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
+    transition: all 0.5s ease;
+}
+
+.theme-matcha .page-title {
+    color: #2D5016;
+    text-shadow: none;
+    font-weight: 600;
+}
+
+.theme-performative .page-title {
+    color: #00ffe7;
+    text-shadow: 0 0 6px #00ffe7, 0 0 12px #00ffe7, 0 0 20px #00ffe7;
+}
+
+.page-title svg {
+    display: block;
+    transition: all 0.3s ease;
+}
+
+.page-title:hover svg {
+    transform: scale(1.1);
 }
 
 .form-section {
     max-width: 800px;
     margin: 0 auto 2rem;
-    background-color: rgba(0, 0, 0, 0.2);
-    border: 2px solid #00ffe7;
     border-radius: 16px;
     padding: 1.5rem;
+    transition: all 0.5s ease;
+}
+
+.theme-matcha .form-section {
+    background-color: rgba(156, 175, 136, 0.1);
+    border: 2px solid #9CAF88;
+    box-shadow: 0 4px 6px rgba(45, 80, 22, 0.1);
+}
+
+.theme-performative .form-section {
+    background-color: rgba(0, 0, 0, 0.2);
+    border: 2px solid #00ffe7;
     box-shadow: 0 0 15px #00ffe7;
 }
 
 .loyalty-section {
+    transition: all 0.5s ease;
+}
+
+.theme-matcha .loyalty-section {
+    background-color: rgba(218, 165, 32, 0.08);
+    border: 2px solid #DAA520;
+    box-shadow: 0 4px 6px rgba(218, 165, 32, 0.15);
+}
+
+.theme-performative .loyalty-section {
     background-color: rgba(255, 215, 0, 0.05);
     border: 2px solid gold;
     box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
 }
 
 .section-description {
-    color: #aaa;
     margin-bottom: 1.5rem;
     font-size: 0.95rem;
     line-height: 1.5;
+    transition: all 0.5s ease;
+}
+
+.theme-matcha .section-description {
+    color: #6B7C5A;
+}
+
+.theme-performative .section-description {
+    color: #aaa;
 }
 
 .loyalty-settings {
@@ -80,11 +139,34 @@
 
 .form-title {
     font-size: 1.6rem;
-    color: #ff00c8;
-    text-shadow: 0 0 6px #ff00c8;
     margin-bottom: 1rem;
     margin-top: 0;
     text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: all 0.5s ease;
+}
+
+.theme-matcha .form-title {
+    color: #4A7C59;
+    text-shadow: none;
+    font-weight: 500;
+}
+
+.theme-performative .form-title {
+    color: #ff00c8;
+    text-shadow: 0 0 6px #ff00c8;
+}
+
+.form-title svg {
+    display: block;
+    transition: all 0.3s ease;
+}
+
+.form-title:hover svg {
+    transform: scale(1.1);
 }
 
 .form-wrapper {
@@ -105,16 +187,34 @@
 .neon-divider {
     border: none;
     height: 2px;
-    background: linear-gradient(90deg, transparent, #ff00c8, transparent);
     margin: 2rem 0;
+    transition: all 0.5s ease;
+}
+
+.theme-matcha .neon-divider {
+    background: linear-gradient(90deg, transparent, #9CAF88, transparent);
+}
+
+.theme-performative .neon-divider {
+    background: linear-gradient(90deg, transparent, #ff00c8, transparent);
 }
 
 .glow-text {
-    color: #00ffe7;
-    text-shadow: 0 0 5px #00ffe7;
     margin-bottom: 1rem;
     text-align: center;
     font-size: 1.8rem;
+    transition: all 0.5s ease;
+}
+
+.theme-matcha .glow-text {
+    color: #2D5016;
+    text-shadow: none;
+    font-weight: 600;
+}
+
+.theme-performative .glow-text {
+    color: #00ffe7;
+    text-shadow: 0 0 5px #00ffe7;
 }
 
 .event-grid {
@@ -125,20 +225,40 @@
     max-width: 1400px;
     margin: 0 auto;
     padding: 1.5rem;
-    border: 2px solid #ff00c8;
     border-radius: 16px;
+    transition: all 0.5s ease;
+}
+
+.theme-matcha .event-grid {
+    border: 2px solid #9CAF88;
+    box-shadow: 0 4px 12px rgba(45, 80, 22, 0.1);
+    background-color: rgba(245, 245, 220, 0.3);
+}
+
+.theme-performative .event-grid {
+    border: 2px solid #ff00c8;
     box-shadow: 0 0 15px rgba(255, 0, 200, 0.4);
     background-color: rgba(0, 0, 0, 0.3);
 }
 
 .fake-card {
-    background-color: #1a1a1a;
-    border: 1px dashed #ff00c8;
     border-radius: 10px;
     padding: 1rem;
     text-align: center;
-    color: #ff00c8;
     font-style: italic;
+    transition: all 0.5s ease;
+}
+
+.theme-matcha .fake-card {
+    background-color: rgba(245, 245, 220, 0.5);
+    border: 1px dashed #9CAF88;
+    color: #4A7C59;
+}
+
+.theme-performative .fake-card {
+    background-color: #1a1a1a;
+    border: 1px dashed #ff00c8;
+    color: #ff00c8;
 }
 
 .loading-events, .no-events {
@@ -153,8 +273,16 @@
 
 .events-help-text {
     margin-top: 1rem;
-    color: #aaa;
     font-size: 1rem;
+    transition: all 0.5s ease;
+}
+
+.theme-matcha .events-help-text {
+    color: #6B7C5A;
+}
+
+.theme-performative .events-help-text {
+    color: #aaa;
 }
 
 .event-card-wrapper {
