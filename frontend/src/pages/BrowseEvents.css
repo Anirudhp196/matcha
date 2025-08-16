@@ -40,13 +40,15 @@ body {
 }
 
 .page-title.matcha {
-    color: #2D5016;
-    text-shadow: 0 0 6px rgba(45, 80, 22, 0.3), 0 0 12px rgba(45, 80, 22, 0.2);
+    color: #5a7a76;
+    text-shadow: none;
+    font-weight: 600;
 }
 
 .page-title.performative {
-    color: #B565A7;
-    text-shadow: 0 0 3px rgba(181, 101, 167, 0.2);
+    color: #e8f0ef;
+    text-shadow: none;
+    font-weight: 600;
 }
 
 /* Keep old class for backward compatibility */

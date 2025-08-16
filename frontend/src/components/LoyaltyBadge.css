@@ -1,11 +1,12 @@
 .loyalty-badge {
-    background: linear-gradient(45deg, gold, orange);
+    background: #8b7355;
     padding: 3px 8px;
     border-radius: 10px;
     font-size: 0.8rem;
-    font-weight: bold;
-    color: black;
+    font-weight: 600;
+    color: #ffffff;
     margin-left: 8px;
+    border: 1px solid #6b5a45;
 }
 
 .progress-bar-container {
@@ -15,19 +16,21 @@
 
 .progress-text {
     font-size: 0.7rem;
-    color: #ccc;
+    color: #9bb5b3;
     margin-bottom: 2px;
+    font-weight: 500;
 }
 
 .progress-bar {
     width: 100%;
-    background-color: #444;
+    background-color: #2a3a38;
     border-radius: 8px;
     overflow: hidden;
     height: 8px;
+    border: 1px solid #3a4a48;
 }
 
 .progress-bar-fill {
     height: 8px;
-    background: linear-gradient(90deg, #00c3ff, #0055ff);
+    background: #5a7a76;
 }
