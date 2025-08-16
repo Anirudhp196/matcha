@@ -11,9 +11,7 @@ const PINATA_API_KEY = "3bf4164172fae7b68de3";
 const PINATA_SECRET = "32288745dd22dabdcc87653918e33841ccfcfbd45c43a89709f873aedcc7c9fe";
 
 const CreateConcertForm = ({ onCreated }) => {
-  const { eventContract, address, goldRequirement, artistName } = useWeb3();
-  const { theme } = useTheme();
-  const isMatcha = theme === 'matcha';
+  const { eventContract, address, goldRequirement, getDisplayName } = useWeb3();
   const [form, setForm] = useState({
     name: "",
     description: "",
@@ -72,7 +70,7 @@ const CreateConcertForm = ({ onCreated }) => {
         { trait_type: "Event Date", value: form.date },
         { trait_type: "Location", value: form.location },
         { trait_type: "Artist Address", value: address },
-        { trait_type: "Artist Name", value: artistName || "Unknown Artist" }
+        { trait_type: "Artist Name", value: getDisplayName() }
       ],
     };
 
@@ -104,10 +102,13 @@ const CreateConcertForm = ({ onCreated }) => {
 
   const createConcert = async (e) => {
     e.preventDefault();
+    console.log("CreateConcert: Using updated version without artistName requirement");
+    console.log("Display name:", getDisplayName());
+    
     if (!eventContract || !address) return toast.error("Connect your wallet first!");
     if (!image) return toast.error("Please upload an image!");
     if (!form.price) return toast.error("Enter a valid ticket price.");
-    if (!artistName) return toast.error("Artist name is required. Please complete your profile setup.");
+    // Artist name is automatically determined from wallet address or ENS
 
     // Check if the event date is in the future
     const eventDate = new Date(form.date);
@@ -242,7 +243,7 @@ const CreateConcertForm = ({ onCreated }) => {
         
         <div className="form-row">
           <div className="form-group">
-            <label htmlFor="price">Ticket Price (DOT)</label>
+            <label htmlFor="price">Ticket Price (CHZ)</label>
             <input 
               id="price" 
               type="number" 

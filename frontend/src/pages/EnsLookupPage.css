@@ -1,0 +1,136 @@
+.ens-page {
+  min-height: calc(100vh - 80px);
+  padding-bottom: 2rem;
+}
+
+.ens-page-header {
+  background: linear-gradient(135deg, var(--current-primary) 0%, var(--current-accent) 100%);
+  color: var(--white);
+  padding: 3rem 2rem;
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.ens-page-hero {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.ens-hero-title {
+  font-size: 3rem;
+  font-weight: bold;
+  margin: 0 0 1rem 0;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.ens-hero-subtitle {
+  font-size: 1.25rem;
+  opacity: 0.95;
+  margin: 0;
+  line-height: 1.6;
+}
+
+.ens-page-content {
+  margin-bottom: 3rem;
+}
+
+.ens-page-info {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+.info-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.info-card {
+  padding: 2rem;
+  text-align: center;
+  transition: all var(--transition-medium);
+}
+
+.info-card:hover {
+  transform: translateY(-8px);
+  box-shadow: var(--shadow-heavy);
+}
+
+.info-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: var(--current-primary);
+  margin: 0 0 1rem 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.info-text {
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--current-dark);
+  margin: 0;
+}
+
+/* Theme-specific styling */
+.theme-matcha .ens-page-header {
+  background: linear-gradient(135deg, var(--matcha-primary) 0%, var(--matcha-accent) 50%, var(--matcha-dark) 100%);
+}
+
+.theme-performative .ens-page-header {
+  background: linear-gradient(135deg, var(--performative-primary) 0%, var(--performative-accent) 50%, var(--performative-dark) 100%);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .ens-page-header {
+    padding: 2rem 1rem;
+  }
+  
+  .ens-hero-title {
+    font-size: 2.25rem;
+  }
+  
+  .ens-hero-subtitle {
+    font-size: 1.1rem;
+  }
+  
+  .ens-page-info {
+    padding: 0 1rem;
+  }
+  
+  .info-cards {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  
+  .info-card {
+    padding: 1.5rem;
+  }
+  
+  .info-title {
+    font-size: 1.25rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .ens-page-header {
+    padding: 1.5rem 0.5rem;
+  }
+  
+  .ens-hero-title {
+    font-size: 2rem;
+  }
+  
+  .ens-hero-subtitle {
+    font-size: 1rem;
+  }
+  
+  .info-card {
+    padding: 1rem;
+  }
+}

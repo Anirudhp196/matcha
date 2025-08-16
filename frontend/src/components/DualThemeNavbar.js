@@ -120,6 +120,7 @@ const DualThemeNavbar = () => {
       {isMenuOpen && (
         <div className={`mobile-nav ${isMatcha ? 'theme-matcha' : 'theme-performative'}`}>
           <div className="mobile-nav-content">
+
             <Link 
               to="/" 
               className={`mobile-nav-link ${isActive('/')}`}

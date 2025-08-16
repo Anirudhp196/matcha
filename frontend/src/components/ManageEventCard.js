@@ -41,7 +41,7 @@ const ManageEventCard = ({ event, onCancel, onUpdate }) => {
       })
     : "Date TBD";
 
-  const formattedPrice = price ? `${ethers.utils.formatEther(price)} DOT` : "—";
+  const formattedPrice = price ? `${ethers.utils.formatEther(price)} CHZ` : "—";
   const sold = ticketsSold ? ticketsSold.toString() : "0";
   const supply = maxTickets ? maxTickets.toString() : "?";
 
