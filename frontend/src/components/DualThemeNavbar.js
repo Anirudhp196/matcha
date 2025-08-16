@@ -32,7 +32,7 @@ const DualThemeNavbar = () => {
             {isMatcha ? '⚽' : '🎧'}
           </div>
           <h1 className="brand-title">
-            match-a | performative
+            Matcha
           </h1>
         </Link>
 

@@ -57,13 +57,13 @@ export const Web3Provider = ({ children }) => {
         const currentNetwork = await ethersProvider.getNetwork();
         console.log("Current network:", currentNetwork);
 
-        // Check if we're on Chiliz Spicy Testnet (chainId: 88882)
-        if (currentNetwork.chainId !== 88882) {
-          console.log("Wrong network, switching to Chiliz Spicy Testnet...");
+        // Check if we're on Local Hardhat Network (chainId: 31337)
+        if (currentNetwork.chainId !== 31337) {
+          console.log("Wrong network, switching to Local Hardhat Network...");
           try {
             await ethereumProvider.request({
               method: "wallet_switchEthereumChain",
-              params: [{ chainId: "0x15b32" }], // 88882 in hex
+              params: [{ chainId: "0x7a69" }], // 31337 in hex
             });
           } catch (switchError) {
             console.error("Failed to switch network:", switchError);
@@ -74,25 +74,25 @@ export const Web3Provider = ({ children }) => {
                   method: "wallet_addEthereumChain",
                   params: [
                     {
-                      chainId: "0x15b32", // 88882
-                      chainName: "Chiliz Spicy Testnet",
+                      chainId: "0x7a69", // 31337
+                      chainName: "Localhost 8545",
                       nativeCurrency: {
-                        name: "CHZ",
-                        symbol: "CHZ",
+                        name: "ETH",
+                        symbol: "ETH",
                         decimals: 18,
                       },
-                      rpcUrls: ["https://spicy-rpc.chiliz.com/"],
-                      blockExplorerUrls: ["https://testnet.chiliscan.com/"],
+                      rpcUrls: ["http://127.0.0.1:8545"],
+                      blockExplorerUrls: [],
                     },
                   ],
                 });
               } catch (addError) {
                 console.error("Failed to add network:", addError);
-                toast.error("Please manually switch to Chiliz Spicy Testnet");
+                toast.error("Please manually add and switch to Localhost:8545");
                 return;
               }
             } else {
-              toast.error("Please switch to Chiliz Spicy Testnet");
+              toast.error("Please switch to Localhost:8545");
               return;
             }
           }

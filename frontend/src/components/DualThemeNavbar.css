@@ -14,18 +14,20 @@
 }
 
 .theme-performative {
-  background: rgba(139, 0, 0, 0.95);
-  border-bottom: 2px solid #FF1493;
+  background: rgba(30, 30, 40, 0.95);
+  border-bottom: 2px solid #C85A8E;
 }
 
 .navbar-content {
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
   padding: 0 20px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 70px;
+  height: 80px;
+  gap: 20px;
+  flex-wrap: nowrap;
 }
 
 /* Logo Section */
@@ -34,6 +36,8 @@
   align-items: center;
   text-decoration: none;
   transition: transform 0.3s ease;
+  flex-shrink: 0;
+  min-width: 120px;
 }
 
 .logo-container:hover {
@@ -62,15 +66,16 @@
 }
 
 .theme-performative .brand-title {
-  color: #FF1493;
+  color: #E890B0;
 }
 
 /* Theme Toggle Container */
 .theme-toggle-container {
-  flex: 1;
+  flex: 0 1 auto;
   display: flex;
   justify-content: center;
   align-items: center;
+  margin: 0 20px;
 }
 
 .theme-toggle {
@@ -80,7 +85,7 @@
   padding: 6px;
   border-radius: 50px;
   transition: all 0.3s ease;
-  transform: scale(1.1);
+  transform: scale(1);
   animation: pulse 2s infinite;
 }
 
@@ -100,9 +105,9 @@
 }
 
 .theme-performative .theme-toggle {
-  background: rgba(54, 69, 79, 0.9);
-  border: 2px solid #FF1493;
-  box-shadow: 0 4px 15px rgba(139, 0, 0, 0.3);
+  background: rgba(60, 60, 70, 0.9);
+  border: 2px solid #C85A8E;
+  box-shadow: 0 4px 15px rgba(200, 90, 142, 0.3);
 }
 
 /* Toggle Slider */
@@ -128,12 +133,12 @@
 
 .theme-performative .slide-left {
   left: 4px;
-  background: #8B0000;
+  background: #C85A8E;
 }
 
 .theme-performative .slide-right {
   left: calc(50% + 2px);
-  background: #8B0000;
+  background: #C85A8E;
 }
 
 /* Toggle Buttons */
@@ -177,7 +182,8 @@
 .navbar-links {
   display: flex;
   align-items: center;
-  gap: 24px;
+  gap: 16px;
+  flex-shrink: 0;
 }
 
 .nav-link {
@@ -199,20 +205,21 @@
 }
 
 .theme-performative .nav-link {
-  color: #FF1493;
+  color: #E890B0;
 }
 
 .theme-performative .nav-link:hover,
 .theme-performative .nav-link.active {
-  background: rgba(139, 0, 0, 0.2);
-  color: #FF1493;
+  background: rgba(200, 90, 142, 0.2);
+  color: #FFF;
 }
 
 /* Wallet Section */
 .wallet-section {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
+  flex-shrink: 0;
 }
 
 .user-role {
@@ -235,7 +242,7 @@
 }
 
 .role-badge.performative {
-  background: #8B0000;
+  background: #C85A8E;
   color: white;
 }
 
@@ -259,11 +266,11 @@
 }
 
 .theme-performative .mobile-menu-button {
-  color: #FF1493;
+  color: #E890B0;
 }
 
 .theme-performative .mobile-menu-button:hover {
-  background: rgba(139, 0, 0, 0.2);
+  background: rgba(200, 90, 142, 0.2);
 }
 
 .hamburger-icon {
@@ -285,8 +292,8 @@
 }
 
 .theme-performative .mobile-nav {
-  background: rgba(54, 69, 79, 0.95);
-  border-top-color: #FF1493;
+  background: rgba(30, 30, 40, 0.95);
+  border-top-color: #C85A8E;
 }
 
 .mobile-nav-content {
@@ -313,12 +320,12 @@
 }
 
 .theme-performative .mobile-nav-link {
-  color: #FF1493;
+  color: #E890B0;
 }
 
 .theme-performative .mobile-nav-link:hover,
 .theme-performative .mobile-nav-link.active {
-  background: rgba(139, 0, 0, 0.2);
+  background: rgba(200, 90, 142, 0.2);
 }
 
 /* Responsive Design */
