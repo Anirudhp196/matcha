@@ -260,6 +260,11 @@ export const Web3Provider = ({ children }) => {
   const getArtistName = async (artistAddress) => {
     if (!artistAddress || !eventContract) return "Unknown Artist";
     try {
+
+      const res = await fetch(`http://localhost:4000/api/ens-name/0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045
+`);
+      const data = res.await();
+      if(data && data.name) return data.name;
       const profile = await fetchArtistProfile(artistAddress, eventContract);
       return profile?.name || "Unknown Artist";
     } catch (err) {

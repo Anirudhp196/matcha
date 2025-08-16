@@ -2,7 +2,7 @@ const { ethers } = require("ethers");
 require("dotenv").config();
 
 // Default to mainnet for ENS resolution, can be parameterized if needed
-const provider = new ethers.JsonRpcProvider(process.env.ENS_RPC_URL || "https://mainnet.infura.io/v3/" + process.env.INFURA_KEY);
+const provider = new ethers.providers.JsonRpcProvider("https://cloudflare-eth.com");
 
 /**
  * Resolves the ENS name for a given Ethereum address, and verifies it resolves back to the address.
