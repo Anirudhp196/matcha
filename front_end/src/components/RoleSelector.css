@@ -1,0 +1,132 @@
+.role-selector-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease;
+}
+
+.role-selector-container {
+  background: #141414;
+  width: 600px;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 0 30px rgba(255, 0, 200, 0.6), 0 0 20px rgba(0, 255, 231, 0.5);
+  animation: glowPulse 3s infinite alternate;
+}
+
+.role-selector-header {
+  background: linear-gradient(90deg, #ff00c8, #00ffe7);
+  padding: 1.25rem;
+  text-align: center;
+}
+
+.role-selector-header h2 {
+  color: #fff;
+  margin: 0;
+  font-size: 1.8rem;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
+.role-selector-content {
+  display: flex;
+  min-height: 250px;
+}
+
+.role-option {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.role-option:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.role-option h3 {
+  font-size: 1.4rem;
+  margin-bottom: 2rem;
+  font-weight: 600;
+}
+
+.fan-option h3 {
+  color: #ff00c8;
+  text-shadow: 0 0 8px rgba(255, 0, 200, 0.7);
+}
+
+.artist-option h3 {
+  color: #00ffe7;
+  text-shadow: 0 0 8px rgba(0, 255, 231, 0.7);
+}
+
+.role-divider {
+  width: 1px;
+  background: linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.7), transparent);
+}
+
+.role-button {
+  font-size: 1.1rem;
+  font-weight: bold;
+  padding: 0.8rem 2.5rem;
+  border-radius: 30px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: "Share Tech Mono", monospace;
+}
+
+.fan-button {
+  background: linear-gradient(45deg, #ff00c8, #7928ca);
+  color: white;
+  box-shadow: 0 0 15px rgba(255, 0, 200, 0.5);
+}
+
+.fan-button:hover {
+  transform: scale(1.05) translateY(-5px);
+  box-shadow: 0 0 25px rgba(255, 0, 200, 0.8);
+}
+
+.artist-button {
+  background: linear-gradient(45deg, #00ffe7, #00a5e6);
+  color: black;
+  box-shadow: 0 0 15px rgba(0, 255, 231, 0.5);
+}
+
+.artist-button:hover {
+  transform: scale(1.05) translateY(-5px);
+  box-shadow: 0 0 25px rgba(0, 255, 231, 0.8);
+}
+
+.role-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.role-button:disabled {
+  opacity: 0.7;
+  cursor: wait;
+  transform: none !important;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes glowPulse {
+  0% { box-shadow: 0 0 20px rgba(255, 0, 200, 0.6), 0 0 10px rgba(0, 255, 231, 0.3); }
+  100% { box-shadow: 0 0 35px rgba(255, 0, 200, 0.8), 0 0 25px rgba(0, 255, 231, 0.6); }
+}

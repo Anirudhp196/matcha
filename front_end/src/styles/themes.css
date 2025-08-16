@@ -1,0 +1,159 @@
+/* Global Theme Variables */
+:root {
+  /* Match-a Theme (Sports) */
+  --matcha-primary: #9CAF88;
+  --matcha-secondary: #F5F5DC;
+  --matcha-dark: #2D5016;
+  --matcha-accent: #6B8E23;
+  --matcha-light: #E8F5E8;
+  
+  /* Performative Theme (Concerts) */
+  --performative-primary: #8B0000;
+  --performative-secondary: #FF1493;
+  --performative-dark: #36454F;
+  --performative-accent: #DC143C;
+  --performative-light: #FFF0F5;
+  
+  /* Common Colors */
+  --white: #FFFFFF;
+  --black: #000000;
+  --gray-light: #F5F5F5;
+  --gray-medium: #CCCCCC;
+  --gray-dark: #666666;
+  
+  /* Transitions */
+  --transition-fast: 0.2s ease;
+  --transition-medium: 0.3s ease;
+  --transition-slow: 0.5s ease;
+  
+  /* Shadows */
+  --shadow-light: 0 2px 8px rgba(0, 0, 0, 0.1);
+  --shadow-medium: 0 4px 16px rgba(0, 0, 0, 0.15);
+  --shadow-heavy: 0 8px 32px rgba(0, 0, 0, 0.2);
+  
+  /* Border Radius */
+  --radius-small: 4px;
+  --radius-medium: 8px;
+  --radius-large: 16px;
+  --radius-round: 50px;
+}
+
+/* Theme-specific body backgrounds */
+body.theme-matcha {
+  background: linear-gradient(135deg, var(--matcha-light) 0%, var(--matcha-secondary) 100%);
+  color: var(--matcha-dark);
+}
+
+body.theme-performative {
+  background: linear-gradient(135deg, var(--performative-light) 0%, var(--performative-secondary) 20%, var(--performative-dark) 100%);
+  color: var(--white);
+}
+
+/* Theme utility classes */
+.theme-matcha {
+  --current-primary: var(--matcha-primary);
+  --current-secondary: var(--matcha-secondary);
+  --current-dark: var(--matcha-dark);
+  --current-accent: var(--matcha-accent);
+  --current-light: var(--matcha-light);
+}
+
+.theme-performative {
+  --current-primary: var(--performative-primary);
+  --current-secondary: var(--performative-secondary);
+  --current-dark: var(--performative-dark);
+  --current-accent: var(--performative-accent);
+  --current-light: var(--performative-light);
+}
+
+/* Common theme-aware components */
+.theme-button {
+  padding: 12px 24px;
+  border: none;
+  border-radius: var(--radius-medium);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-medium);
+  text-decoration: none;
+  display: inline-block;
+  text-align: center;
+}
+
+.theme-button.primary {
+  background: var(--current-primary);
+  color: var(--white);
+}
+
+.theme-button.primary:hover {
+  background: var(--current-accent);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-medium);
+}
+
+.theme-button.secondary {
+  background: transparent;
+  color: var(--current-primary);
+  border: 2px solid var(--current-primary);
+}
+
+.theme-button.secondary:hover {
+  background: var(--current-primary);
+  color: var(--white);
+}
+
+/* Theme-aware cards */
+.theme-card {
+  background: var(--white);
+  border-radius: var(--radius-large);
+  padding: 24px;
+  box-shadow: var(--shadow-light);
+  transition: all var(--transition-medium);
+  border: 2px solid transparent;
+}
+
+.theme-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-heavy);
+}
+
+.theme-matcha .theme-card {
+  border-color: var(--matcha-primary);
+}
+
+.theme-performative .theme-card {
+  border-color: var(--performative-primary);
+}
+
+/* Theme-aware text */
+.theme-text-primary {
+  color: var(--current-primary);
+}
+
+.theme-text-secondary {
+  color: var(--current-secondary);
+}
+
+.theme-text-dark {
+  color: var(--current-dark);
+}
+
+/* Theme-aware backgrounds */
+.theme-bg-primary {
+  background: var(--current-primary);
+}
+
+.theme-bg-secondary {
+  background: var(--current-secondary);
+}
+
+.theme-bg-light {
+  background: var(--current-light);
+}
+
+/* Responsive theme adjustments */
+@media (max-width: 768px) {
+  :root {
+    --radius-large: 12px;
+    --shadow-heavy: 0 4px 16px rgba(0, 0, 0, 0.15);
+  }
+}

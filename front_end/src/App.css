@@ -1,0 +1,31 @@
+@keyframes neonFlicker {
+    0%,
+    19%,
+    21%,
+    23%,
+    25%,
+    54%,
+    56%,
+    100% {
+        text-shadow:
+            0 0 5px #ff00c8,
+            0 0 10px #ff00c8,
+            0 0 20px #ff00c8,
+            0 0 40px #ff00c8,
+            0 0 80px #ff00c8;
+        opacity: 1;
+    }
+
+    20%,
+    24%,
+    55% {
+        text-shadow: none;
+        opacity: 0.6;
+    }
+}
+
+.neon-flicker {
+    font-size: 2rem;
+    color: #ff00c8;
+    animation: neonFlicker 3s infinite;
+}

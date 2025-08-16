@@ -1,0 +1,33 @@
+.loyalty-badge {
+    background: linear-gradient(45deg, gold, orange);
+    padding: 3px 8px;
+    border-radius: 10px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    color: black;
+    margin-left: 8px;
+}
+
+.progress-bar-container {
+    margin-top: 5px;
+    width: 100%;
+}
+
+.progress-text {
+    font-size: 0.7rem;
+    color: #ccc;
+    margin-bottom: 2px;
+}
+
+.progress-bar {
+    width: 100%;
+    background-color: #444;
+    border-radius: 8px;
+    overflow: hidden;
+    height: 8px;
+}
+
+.progress-bar-fill {
+    height: 8px;
+    background: linear-gradient(90deg, #00c3ff, #0055ff);
+}

@@ -1,0 +1,194 @@
+body {
+    background-color: #0f0f0f;
+    font-family: "Share Tech Mono", monospace;
+    color: #d1f2ff;
+}
+
+.browse-events-container {
+    padding: 2rem;
+    text-align: center;
+    transition: all 0.5s ease;
+}
+
+/* Theme-specific styles */
+.theme-matcha {
+    background: linear-gradient(135deg, rgba(156, 175, 136, 0.1) 0%, rgba(245, 245, 220, 0.1) 100%);
+}
+
+.theme-performative {
+    background: linear-gradient(135deg, rgba(139, 0, 0, 0.1) 0%, rgba(54, 69, 79, 0.1) 100%);
+}
+
+.page-title {
+    font-size: 2.5rem;
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: all 0.5s ease;
+}
+
+.page-title.matcha {
+    color: #2D5016;
+    text-shadow: 0 0 6px rgba(45, 80, 22, 0.3), 0 0 12px rgba(45, 80, 22, 0.2);
+}
+
+.page-title.performative {
+    color: #FF1493;
+    text-shadow: 0 0 6px rgba(255, 20, 147, 0.3), 0 0 12px rgba(255, 20, 147, 0.2);
+}
+
+/* Keep old class for backward compatibility */
+.neon-title {
+    font-size: 2.5rem;
+    color: #00ffe7;
+    text-shadow: 0 0 6px #00ffe7, 0 0 12px #00ffe7, 0 0 20px #00ffe7;
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.glow-text {
+    color: #ff0090;
+    text-shadow: 0 0 6px #ff0090, 0 0 10px #ff0090;
+    transition: all 0.5s ease;
+}
+
+.glow-text.matcha {
+    color: #2D5016;
+    text-shadow: 0 0 6px rgba(45, 80, 22, 0.3), 0 0 10px rgba(45, 80, 22, 0.2);
+}
+
+.glow-text.performative {
+    color: #FF1493;
+    text-shadow: 0 0 6px rgba(255, 20, 147, 0.3), 0 0 10px rgba(255, 20, 147, 0.2);
+}
+
+.event-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 1.5rem;
+    justify-content: center;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 1rem;
+    border: 2px solid #ff00c8;
+    border-radius: 16px;
+    box-shadow: 0 0 15px rgba(255, 0, 200, 0.4);
+    background-color: rgba(0, 0, 0, 0.3);
+}
+
+.event-card {
+    position: relative; /* Added to contain the absolute banner */
+    border: 2px solid #ff0090;
+    background: rgba(255, 255, 255, 0.03);
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 0 12px #ff0090;
+    transition: transform 0.2s;
+    display: flex; /* Ensure consistent layout */
+    flex-direction: column; /* Ensure consistent layout */
+}
+
+.event-card:hover {
+    transform: scale(1.03);
+    box-shadow: 0 0 16px #ff00c8;
+}
+
+.event-card h2 {
+    color: #ffffff;
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.metadata-uri {
+    font-size: 0.8rem;
+    color: #999;
+    word-break: break-word;
+    margin-top: 0.5rem;
+}
+
+.buy-button {
+    margin-top: 1rem;
+    padding: 0.6rem 1.2rem;
+    font-weight: bold;
+    background-color: #00ffe7;
+    color: #000;
+    border: none;
+    border-radius: 6px;
+    box-shadow: 0 0 8px #00ffe7;
+    cursor: pointer;
+    transition: background 0.3s, box-shadow 0.3s;
+}
+
+.buy-button:hover {
+    background-color: #00ffcc;
+    box-shadow: 0 0 12px #00ffe7, 0 0 24px #00ffe7;
+}
+
+.buy-button:disabled {
+    background-color: #555;
+    color: #aaa;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+/* Guest mode styling */
+.guest-banner {
+    padding: 1rem;
+    margin: 0 auto 2rem auto;
+    max-width: 800px;
+    border-radius: 8px;
+    transition: all 0.5s ease;
+}
+
+.guest-banner.matcha {
+    background: linear-gradient(90deg, rgba(156, 175, 136, 0.2), rgba(245, 245, 220, 0.2));
+    border: 1px solid #2D5016;
+    box-shadow: 0 0 15px rgba(45, 80, 22, 0.3);
+    animation: glowMatcha 2s ease-in-out infinite alternate;
+}
+
+.guest-banner.performative {
+    background: linear-gradient(90deg, rgba(139, 0, 0, 0.2), rgba(255, 20, 147, 0.2));
+    border: 1px solid #FF1493;
+    box-shadow: 0 0 15px rgba(255, 20, 147, 0.3);
+    animation: glowPerformative 2s ease-in-out infinite alternate;
+}
+
+.guest-banner p {
+    color: #ffffff;
+    font-size: 1.1rem;
+    text-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
+    margin: 0;
+}
+
+@keyframes glow {
+    from {
+        box-shadow: 0 0 10px rgba(255, 0, 200, 0.3);
+    }
+    to {
+        box-shadow: 0 0 20px rgba(0, 255, 231, 0.5);
+    }
+}
+
+@keyframes glowMatcha {
+    from {
+        box-shadow: 0 0 10px rgba(45, 80, 22, 0.3);
+    }
+    to {
+        box-shadow: 0 0 20px rgba(156, 175, 136, 0.5);
+    }
+}
+
+@keyframes glowPerformative {
+    from {
+        box-shadow: 0 0 10px rgba(139, 0, 0, 0.3);
+    }
+    to {
+        box-shadow: 0 0 20px rgba(255, 20, 147, 0.5);
+    }
+}
