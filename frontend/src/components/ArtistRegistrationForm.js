@@ -45,7 +45,7 @@ const ArtistRegistrationForm = ({ onComplete }) => {
 
   return (
     <div className="artist-registration-container">
-      <h2>🎤 Complete your Artist Profile</h2>
+      <h2>Complete your Artist Profile</h2>
       <p className="subtitle">Set your loyal fan requirements before creating concerts</p>
       
       <form onSubmit={handleSubmit} className="artist-form">

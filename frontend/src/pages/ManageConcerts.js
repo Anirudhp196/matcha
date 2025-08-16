@@ -4,6 +4,7 @@ import { useWeb3 } from "../contexts/Web3Context";
 import { useTheme } from "../contexts/ThemeContext";
 import { useEvents } from "../hooks/useEvents";
 import LoadingSpinner from "../components/LoadingSpinner";
+import { MatchaIcon, MusicPerformanceIcon, TicketIcon } from "../components/Icons";
 import "./ManageConcerts.css";
 import CreateConcertForm from "../components/CreateConcertForm";
 import ManageEventCard from "../components/ManageEventCard";
@@ -58,7 +59,7 @@ const ManageConcerts = () => {
   return (
     <div className={`manage-concerts-container theme-${theme}`}>
       <h1 className={`page-title ${isMatcha ? 'matcha' : 'performative'}`}>
-        {isMatcha ? '⚽ Manage Your Matches' : '🎛 Manage Your Concerts'}
+        {isMatcha ? <><MatchaIcon size={32} /> Manage Your Matches</> : <><MusicPerformanceIcon size={32} /> Manage Your Concerts</>}
       </h1>
 
       <div className="form-section loyalty-section">
@@ -80,7 +81,7 @@ const ManageConcerts = () => {
 
       <div className="form-section">
         <h2 className="form-title">
-          {isMatcha ? '⚽ Create a New Match' : '🎸 Create a New Concert'}
+          {isMatcha ? <><MatchaIcon size={24} /> Create a New Match</> : <><MusicPerformanceIcon size={24} /> Create a New Concert</>}
         </h2>
         <div className="form-wrapper">
           <CreateConcertForm onCreated={refetch} />
@@ -89,7 +90,7 @@ const ManageConcerts = () => {
 
       <hr className="neon-divider" />
 
-      <h2 className="form-title">🎟️ Your Events</h2>
+      <h2 className="form-title"><TicketIcon size={24} /> Your Events</h2>
       {loading ? (
         <div className="loading-events">
           <LoadingSpinner size="large" text="Loading your concerts..." />
