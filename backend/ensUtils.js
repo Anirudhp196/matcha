@@ -24,4 +24,31 @@ async function getENSName(address) {
   }
 }
 
-module.exports = { getENSName }; 
+/**
+ * Resolves the full ENS profile for a given Ethereum address.
+ * @param {string} address - The Ethereum address to look up.
+ * @returns {Promise<object|null>} - The ENS profile object or null.
+ */
+async function getENSProfile(address) {
+  const name = await getENSName(address);
+  if (!name) {
+    return { address, name: null, avatar: null, description: null, url: null, twitter: null, github: null };
+  }
+
+  const resolver = await provider.getResolver(name);
+  if (!resolver) {
+    return { address, name, avatar: null, description: null, url: null, twitter: null, github: null };
+  }
+
+  const [avatar, description, url, twitter, github] = await Promise.all([
+    resolver.getText("avatar"),
+    resolver.getText("description"),
+    resolver.getText("url"),
+    resolver.getText("com.twitter"),
+    resolver.getText("com.github"),
+  ]);
+
+  return { address, name, avatar, description, url, twitter, github };
+}
+
+module.exports = { getENSName, getENSProfile }; 
