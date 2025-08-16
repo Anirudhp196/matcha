@@ -2,12 +2,12 @@ import { useWeb3 } from "../contexts/Web3Context";
 import { useState, useEffect } from "react";
 
 export const useTickets = () => {
-  const { ticketContract, address } = useWeb3();
+  const { ticketContract, address, eventContract } = useWeb3();
   const [tickets, setTickets] = useState([]);
   const [loading, setLoading] = useState(false);
 
   const fetchMyTickets = async () => {
-    if (!ticketContract || !address) return;
+    if (!ticketContract || !address || !eventContract) return;
     setLoading(true);
 
     try {
@@ -19,7 +19,18 @@ export const useTickets = () => {
           const owner = await ticketContract.ownerOf(i);
           if (owner.toLowerCase() === address.toLowerCase()) {
             const uri = await ticketContract.tokenURI(i);
-            owned.push({ tokenId: i, uri });
+            const eventId = await ticketContract.eventIdForTicket(i);
+            
+            // Get event details to determine type
+            const eventData = await eventContract.events(eventId);
+            
+            owned.push({ 
+              tokenId: i, 
+              uri,
+              eventId: eventId.toNumber(),
+              eventType: eventData.eventType, // 0 = Performance, 1 = Sports
+              eventData
+            });
           }
         } catch (err) {
           // Might be non-existent tokenId — skip
@@ -36,7 +47,7 @@ export const useTickets = () => {
 
   useEffect(() => {
     fetchMyTickets();
-  }, [ticketContract, address]);
+  }, [ticketContract, address, eventContract]);
 
   return { tickets, loading, refetch: fetchMyTickets };
 };

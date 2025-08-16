@@ -1,5 +1,5 @@
 const express = require("express");
-const { getENSName, getENSProfile } = require("../ensUtils");
+const { getENSName, getENSProfile, checkENSAvailability, getENSRegistrationCost } = require("../ensUtils");
 require("dotenv").config();
 
 const app = express();
@@ -41,6 +41,64 @@ app.get("/api/ens-profile/:address", async (req, res) => {
   }
   const ensProfile = await getENSProfile(address);
   res.json(ensProfile);
+});
+
+// ENS availability check endpoint
+app.get("/api/ens-available/:name", async (req, res) => {
+  const { name } = req.params;
+  console.log(`ENS availability check for name: ${name}`);
+  
+  if (!name || name.length < 3) {
+    console.log(`Invalid name: ${name}`);
+    return res.status(400).json({ error: "Name must be at least 3 characters long" });
+  }
+  
+  // Clean the name (remove .eth if present, sanitize)
+  const cleanName = name.toLowerCase().replace(/\.eth$/, "").replace(/[^a-z0-9]/g, "");
+  
+  if (cleanName !== name.toLowerCase().replace(/\.eth$/, "")) {
+    return res.status(400).json({ error: "Name contains invalid characters" });
+  }
+  
+  try {
+    const available = await checkENSAvailability(cleanName);
+    console.log(`ENS availability result for ${cleanName}:`, available);
+    res.json({ name: cleanName, available });
+  } catch (error) {
+    console.error(`Error checking ENS availability for ${cleanName}:`, error);
+    res.status(500).json({ error: "ENS availability check failed" });
+  }
+});
+
+// ENS registration cost endpoint
+app.get("/api/ens-cost/:name/:duration", async (req, res) => {
+  const { name, duration } = req.params;
+  console.log(`ENS cost check for name: ${name}, duration: ${duration} years`);
+  
+  if (!name || name.length < 3) {
+    return res.status(400).json({ error: "Name must be at least 3 characters long" });
+  }
+  
+  const durationYears = parseInt(duration);
+  if (isNaN(durationYears) || durationYears < 1 || durationYears > 10) {
+    return res.status(400).json({ error: "Duration must be between 1 and 10 years" });
+  }
+  
+  // Clean the name
+  const cleanName = name.toLowerCase().replace(/\.eth$/, "").replace(/[^a-z0-9]/g, "");
+  
+  if (cleanName !== name.toLowerCase().replace(/\.eth$/, "")) {
+    return res.status(400).json({ error: "Name contains invalid characters" });
+  }
+  
+  try {
+    const cost = await getENSRegistrationCost(cleanName, durationYears);
+    console.log(`ENS cost result for ${cleanName} (${durationYears} years):`, cost);
+    res.json({ name: cleanName, duration: durationYears, cost });
+  } catch (error) {
+    console.error(`Error getting ENS cost for ${cleanName}:`, error);
+    res.status(500).json({ error: "ENS cost lookup failed" });
+  }
 });
 
 app.listen(PORT, () => {

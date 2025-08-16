@@ -67,7 +67,8 @@ contract Marketplace is ReentrancyGuard, Ownable {
             bool cancelled,
             , // loyaltyStartTimestamp
             , // publicStartTimestamp
-            // goldRequirement
+            , // goldRequirement
+            // eventType
         ) = eventManager.events(listing.eventId);
 
         require(!cancelled, "Event cancelled");

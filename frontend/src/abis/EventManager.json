@@ -1,5 +1,5 @@
 {
-  "address": "0xb3Ee1f04bfD48F9b258E4B7C8208c6DE576Bf84C",
+  "address": "0x3ccA42c697c12Bf9698cD353a40Cd047F8B51761",
   "abi": [
     {
       "inputs": [
@@ -44,12 +44,22 @@
     },
     {
       "inputs": [],
+      "name": "InvalidRoleForEventType",
+      "type": "error"
+    },
+    {
+      "inputs": [],
       "name": "NotAllowedToBuyOwnTicket",
       "type": "error"
     },
     {
       "inputs": [],
       "name": "NotOrganizer",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "OnlyFansCanBuyTickets",
       "type": "error"
     },
     {
@@ -312,6 +322,11 @@
           "internalType": "uint256",
           "name": "goldRequirement",
           "type": "uint256"
+        },
+        {
+          "internalType": "enum IEventManager.EventType",
+          "name": "eventType",
+          "type": "uint8"
         }
       ],
       "name": "createEvent",
@@ -407,6 +422,11 @@
           "internalType": "uint256",
           "name": "goldRequirement",
           "type": "uint256"
+        },
+        {
+          "internalType": "enum IEventManager.EventType",
+          "name": "eventType",
+          "type": "uint8"
         }
       ],
       "stateMutability": "view",
@@ -515,6 +535,13 @@
     {
       "inputs": [],
       "name": "registerAsMusician",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "registerAsSportsTeam",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"

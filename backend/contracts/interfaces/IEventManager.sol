@@ -2,12 +2,15 @@
 pragma solidity ^0.8.19;
 
 interface IEventManager {
+    enum EventType { Performance, Sports }
+    
     function createEvent(
         string memory metadataURI,
         uint256 ticketPrice,
         uint256 maxTickets,
         uint256 eventDate,
-        uint256 goldRequirement
+        uint256 goldRequirement,
+        EventType eventType
     ) external;
 
     function buyTicket(uint256 eventId) external payable;
@@ -31,6 +34,7 @@ interface IEventManager {
         bool cancelled,
         uint256 loyaltyStartTimestamp,
         uint256 publicStartTimestamp,
-        uint256 goldRequirement
+        uint256 goldRequirement,
+        EventType eventType
     );
 }

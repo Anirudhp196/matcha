@@ -14,7 +14,7 @@
 
 .role-selector-container {
   background: #141414;
-  width: 600px;
+  width: 900px;
   border-radius: 20px;
   overflow: hidden;
   box-shadow: 0 0 30px rgba(255, 0, 200, 0.6), 0 0 20px rgba(0, 255, 231, 0.5);
@@ -56,8 +56,16 @@
 
 .role-option h3 {
   font-size: 1.4rem;
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
   font-weight: 600;
+}
+
+.role-description {
+  font-size: 0.9rem;
+  color: #bbb;
+  margin-bottom: 1.5rem;
+  text-align: center;
+  line-height: 1.4;
 }
 
 .fan-option h3 {
@@ -68,6 +76,11 @@
 .artist-option h3 {
   color: #00ffe7;
   text-shadow: 0 0 8px rgba(0, 255, 231, 0.7);
+}
+
+.sports-option h3 {
+  color: #9CAF88;
+  text-shadow: 0 0 8px rgba(156, 175, 136, 0.7);
 }
 
 .role-divider {
@@ -99,13 +112,24 @@
 
 .artist-button {
   background: linear-gradient(45deg, #00ffe7, #00a5e6);
-  color: black;
+  color: white;
   box-shadow: 0 0 15px rgba(0, 255, 231, 0.5);
 }
 
 .artist-button:hover {
   transform: scale(1.05) translateY(-5px);
   box-shadow: 0 0 25px rgba(0, 255, 231, 0.8);
+}
+
+.sports-button {
+  background: linear-gradient(45deg, #9CAF88, #6B8E23);
+  color: white;
+  box-shadow: 0 0 15px rgba(156, 175, 136, 0.5);
+}
+
+.sports-button:hover {
+  transform: scale(1.05) translateY(-5px);
+  box-shadow: 0 0 25px rgba(156, 175, 136, 0.8);
 }
 
 .role-loading {

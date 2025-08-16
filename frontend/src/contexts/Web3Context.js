@@ -3,10 +3,13 @@ import { ethers } from "ethers";
 import { usePrivy, useWallets } from "@privy-io/react-auth";
 import { CONTRACTS } from "../contracts/config";
 import { useEns } from "../hooks/useEns";
+import { useTheme } from "./ThemeContext";
 import RoleSelector from "../components/RoleSelector";
+import EnsRegistration from "../components/EnsRegistration";
 import LoadingSpinner from "../components/LoadingSpinner";
 import axios from "axios";
 import { toast } from "react-hot-toast";
+import GasSponsorship from "../utils/gasSponsorship";
 
 const Web3Context = createContext();
 
@@ -14,6 +17,7 @@ export const Web3Provider = ({ children }) => {
   const { ready, authenticated, login, logout, user } = usePrivy();
   const { wallets } = useWallets();
   const { lookupName, lookupProfile, shortenAddress } = useEns();
+  const { setInitialThemeForRole } = useTheme();
 
   const [provider, setProvider] = useState(null);
   const [signer, setSigner] = useState(null);
@@ -24,6 +28,7 @@ export const Web3Provider = ({ children }) => {
   const [network, setNetwork] = useState(null);
   const [role, setRole] = useState(null);
   const [showRoleSelector, setShowRoleSelector] = useState(false);
+  const [showEnsRegistration, setShowEnsRegistration] = useState(false);
   const [tempUserAddress, setTempUserAddress] = useState(null);
   const [ensName, setEnsName] = useState(null);
   const [ensAvatar, setEnsAvatar] = useState(null);
@@ -32,6 +37,9 @@ export const Web3Provider = ({ children }) => {
   const [isConnecting, setIsConnecting] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState("");
+  
+  // Gas sponsorship instance
+  const [gasSponsorship] = useState(() => new GasSponsorship());
 
   const PINATA_API_KEY = "3bf4164172fae7b68de3";
   const PINATA_SECRET =
@@ -138,6 +146,8 @@ export const Web3Provider = ({ children }) => {
         const savedRole = localStorage.getItem(`mosh-role-${_address}`);
         if (savedRole) {
           setRole(savedRole);
+          // Set initial theme based on saved role
+          setInitialThemeForRole(savedRole);
           if (savedRole === "musician") {
             try {
               setLoadingMessage("Loading artist profile...");
@@ -185,17 +195,18 @@ export const Web3Provider = ({ children }) => {
       await logout();
       // Clear all state
       setProvider(null);
-              setSigner(null);
-        setAddress(null);
-        setNetwork(null);
-        setTicketContract(null);
-        setEventContract(null);
-        setMarketplaceContract(null);
-        setRole(null);
-        setEnsName(null);
-        setEnsAvatar(null);
-        setGoldRequirement(0);
-        setShowRoleSelector(false);
+      setSigner(null);
+      setAddress(null);
+      setNetwork(null);
+      setTicketContract(null);
+      setEventContract(null);
+      setMarketplaceContract(null);
+      setRole(null);
+      setEnsName(null);
+      setEnsAvatar(null);
+      setGoldRequirement(0);
+      setShowRoleSelector(false);
+      setShowEnsRegistration(false);
     } catch (error) {
       console.error("Logout failed:", error);
     }
@@ -298,6 +309,18 @@ export const Web3Provider = ({ children }) => {
     }
   };
 
+  // Execute sponsored transaction
+  const executeSponsoredTransaction = async (contract, functionName, args = [], value = 0) => {
+    try {
+      console.log(`🎯 Attempting sponsored ${functionName} transaction`);
+      return await gasSponsorship.executeSponsoredTransaction(contract, functionName, args, value);
+    } catch (error) {
+      console.error('Sponsored transaction failed, falling back to regular transaction:', error);
+      toast.error('Gas sponsorship failed, please ensure you have CHZ for gas fees');
+      throw error;
+    }
+  };
+
 
 
 
@@ -326,40 +349,118 @@ export const Web3Provider = ({ children }) => {
     return <LoadingSpinner fullscreen text={loadingMessage || "Loading..."} />;
   }
 
-  if (showRoleSelector) {
-    const handleSelectFan = () => {
-      setRole("fan");
-      localStorage.setItem(`mosh-role-${address}`, "fan");
+  // Helper function to complete role selection after ENS check/registration
+  const completeRoleSelection = async (selectedRole) => {
+    if (!address || !eventContract) return;
+    
+    try {
+      setIsLoading(true);
+      setLoadingMessage(`Registering as ${selectedRole}...`);
+      
+      let tx;
+      switch (selectedRole) {
+        case "fan":
+          tx = await executeSponsoredTransaction(eventContract, 'registerAsFan');
+          break;
+        case "musician":
+          tx = await executeSponsoredTransaction(eventContract, 'registerAsMusician');
+          break;
+        case "sportsTeam":
+          tx = await executeSponsoredTransaction(eventContract, 'registerAsSportsTeam');
+          break;
+        default:
+          throw new Error("Invalid role");
+      }
+      
+      await tx.wait();
+
+      setRole(selectedRole);
+      localStorage.setItem(`mosh-role-${address}`, selectedRole);
+      setInitialThemeForRole(selectedRole);
       setShowRoleSelector(false);
-      toast.success("Welcome, fan!");
-    };
+      setShowEnsRegistration(false);
+      
+      const roleDisplayNames = {
+        fan: "fan",
+        musician: "musician",
+        sportsTeam: "sports team"
+      };
+      
+      toast.success(`Welcome, ${roleDisplayNames[selectedRole]}!`);
+    } catch (err) {
+      console.error("Registration failed:", err);
+      toast.error("Registration failed.");
+    } finally {
+      setIsLoading(false);
+      setLoadingMessage("");
+    }
+  };
 
-    const handleSelectArtist = async () => {
-      if (!address || !eventContract) return;
-      try {
-        setIsLoading(true);
-        setLoadingMessage("Registering as musician...");
-        
-        const tx = await eventContract.registerAsMusician();
-        await tx.wait();
+  // Helper function to check ENS and potentially show registration
+  const handleRoleSelectionWithEnsCheck = async (selectedRole) => {
+    // First check if user already has an ENS name
+    if (ensName) {
+      // User already has ENS, proceed directly to role registration
+      await completeRoleSelection(selectedRole);
+      return;
+    }
 
-        setRole("musician");
-        localStorage.setItem(`mosh-role-${address}`, "musician");
-        setShowRoleSelector(false);
-        toast.success(`Welcome, ${getDisplayName()}!`);
-      } catch (err) {
-        console.error("Registration failed:", err);
-        toast.error("Registration failed.");
-      } finally {
-        setIsLoading(false);
-        setLoadingMessage("");
+    // No ENS name, offer to register one
+    setShowRoleSelector(false);
+    setShowEnsRegistration(true);
+    
+    // Store the selected role for after ENS registration
+    localStorage.setItem(`mosh-pending-role-${address}`, selectedRole);
+  };
+
+  if (showEnsRegistration) {
+    const handleEnsRegistrationComplete = async (newEnsName) => {
+      // ENS registration completed, update ENS name and proceed with role
+      setEnsName(newEnsName);
+      setShowEnsRegistration(false);
+      
+      // Get the pending role and complete registration
+      const pendingRole = localStorage.getItem(`mosh-pending-role-${address}`);
+      localStorage.removeItem(`mosh-pending-role-${address}`);
+      
+      if (pendingRole) {
+        await completeRoleSelection(pendingRole);
       }
     };
+
+    const handleEnsRegistrationSkip = async () => {
+      // User skipped ENS registration, proceed with role only
+      setShowEnsRegistration(false);
+      
+      // Get the pending role and complete registration
+      const pendingRole = localStorage.getItem(`mosh-pending-role-${address}`);
+      localStorage.removeItem(`mosh-pending-role-${address}`);
+      
+      if (pendingRole) {
+        await completeRoleSelection(pendingRole);
+      }
+    };
+
+    return (
+      <EnsRegistration
+        address={address}
+        signer={signer}
+        onRegistrationComplete={handleEnsRegistrationComplete}
+        onSkip={handleEnsRegistrationSkip}
+      />
+    );
+  }
+
+  if (showRoleSelector) {
+    const handleSelectFan = () => handleRoleSelectionWithEnsCheck("fan");
+    const handleSelectArtist = () => handleRoleSelectionWithEnsCheck("musician");
+    const handleSelectSportsTeam = () => handleRoleSelectionWithEnsCheck("sportsTeam");
 
     return (
       <RoleSelector
         onSelectFan={handleSelectFan}
         onSelectArtist={handleSelectArtist}
+        onSelectSportsTeam={handleSelectSportsTeam}
       />
     );
   }
@@ -388,6 +489,8 @@ export const Web3Provider = ({ children }) => {
         fetchArtistProfile,
         isConnecting,
         user, // Privy user info (email, etc.)
+        executeSponsoredTransaction, // Custom gas sponsorship
+        gasSponsorship, // Gas sponsorship instance
       }}
     >
       {children}

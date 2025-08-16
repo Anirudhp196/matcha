@@ -1,0 +1,414 @@
+/* ENS Registration Overlay */
+.ens-registration-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.ens-registration-container {
+  background: var(--bg-primary);
+  border-radius: 16px;
+  padding: 32px;
+  max-width: 500px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--border-color);
+}
+
+.ens-registration-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.ens-registration-header h2 {
+  color: var(--text-primary);
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.ens-registration-header p {
+  color: var(--text-secondary);
+  font-size: 16px;
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* Form Section */
+.ens-registration-form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.ens-input-section {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.ens-name-input-group {
+  display: flex;
+  align-items: center;
+  background: var(--bg-secondary);
+  border: 2px solid var(--border-color);
+  border-radius: 12px;
+  padding: 16px;
+  transition: border-color 0.2s ease;
+}
+
+.ens-name-input-group:focus-within {
+  border-color: var(--primary-color);
+}
+
+.ens-name-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--text-primary);
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.ens-name-input::placeholder {
+  color: var(--text-tertiary);
+}
+
+.ens-suffix {
+  color: var(--text-secondary);
+  font-size: 18px;
+  font-weight: 500;
+  margin-left: 8px;
+}
+
+.ens-duration-select {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ens-duration-select label {
+  color: var(--text-primary);
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.duration-select {
+  background: var(--bg-secondary);
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+  padding: 12px;
+  color: var(--text-primary);
+  font-size: 16px;
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.duration-select:focus {
+  border-color: var(--primary-color);
+}
+
+.ens-check-button {
+  padding: 16px 24px;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+}
+
+.ens-check-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Availability Results */
+.ens-availability-result {
+  padding: 20px;
+  border-radius: 12px;
+  text-align: center;
+  margin-top: 8px;
+}
+
+.ens-availability-result.success {
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.1), rgba(34, 197, 94, 0.05));
+  border: 2px solid rgba(34, 197, 94, 0.3);
+}
+
+.ens-availability-result.error {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(239, 68, 68, 0.05));
+  border: 2px solid rgba(239, 68, 68, 0.3);
+}
+
+.availability-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.check-icon, .error-icon {
+  font-size: 24px;
+}
+
+.availability-header h3 {
+  color: var(--text-primary);
+  font-size: 20px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.cost-info {
+  margin-bottom: 20px;
+}
+
+.cost-info p {
+  color: var(--text-primary);
+  margin: 4px 0;
+  font-size: 16px;
+}
+
+.cost-info strong {
+  color: rgb(34, 197, 94);
+}
+
+.cost-note {
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+.suggestion {
+  color: var(--text-secondary);
+  font-size: 14px;
+  margin: 8px 0 0 0;
+}
+
+.ens-register-button {
+  padding: 14px 28px;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 10px;
+  background: rgb(34, 197, 94);
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.ens-register-button:hover:not(:disabled) {
+  background: rgb(22, 163, 74);
+  transform: translateY(-1px);
+}
+
+.ens-register-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Registration Progress */
+.ens-registration-progress {
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.progress-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.progress-header h3 {
+  color: var(--text-primary);
+  font-size: 24px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.countdown-spinner {
+  font-size: 48px;
+  animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.ens-registration-progress p {
+  color: var(--text-primary);
+  font-size: 18px;
+  margin-bottom: 20px;
+}
+
+.progress-note {
+  background: var(--bg-secondary);
+  border-radius: 8px;
+  padding: 16px;
+  border-left: 4px solid var(--primary-color);
+}
+
+.progress-note p {
+  color: var(--text-secondary);
+  font-size: 14px;
+  line-height: 1.5;
+  margin: 8px 0;
+}
+
+.progress-note p:first-child {
+  margin-top: 0;
+}
+
+.progress-note p:last-child {
+  margin-bottom: 0;
+}
+
+/* Registration Complete */
+.ens-registration-complete {
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.success-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.success-icon {
+  font-size: 64px;
+}
+
+.success-header h3 {
+  color: var(--text-primary);
+  font-size: 28px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.ens-registration-complete p {
+  color: var(--text-primary);
+  font-size: 20px;
+  margin-bottom: 20px;
+}
+
+.complete-note {
+  background: var(--bg-secondary);
+  border-radius: 8px;
+  padding: 16px;
+  border-left: 4px solid rgb(34, 197, 94);
+}
+
+.complete-note p {
+  color: var(--text-secondary);
+  font-size: 14px;
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* Footer */
+.ens-registration-footer {
+  margin-top: 32px;
+  text-align: center;
+  border-top: 1px solid var(--border-color);
+  padding-top: 24px;
+}
+
+.ens-skip-button {
+  padding: 12px 24px;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 8px;
+  margin-bottom: 16px;
+}
+
+.ens-help-text {
+  margin-top: 12px;
+}
+
+.ens-help-text p {
+  color: var(--text-tertiary);
+  font-size: 12px;
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* Theme Variations */
+.theme-dark .ens-registration-container {
+  --bg-primary: #1a1a1a;
+  --bg-secondary: #2a2a2a;
+  --text-primary: #ffffff;
+  --text-secondary: #b3b3b3;
+  --text-tertiary: #808080;
+  --border-color: #404040;
+  --primary-color: #3b82f6;
+}
+
+.theme-light .ens-registration-container {
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8f9fa;
+  --text-primary: #1a1a1a;
+  --text-secondary: #4a5568;
+  --text-tertiary: #718096;
+  --border-color: #e2e8f0;
+  --primary-color: #3b82f6;
+}
+
+.theme-fan .ens-registration-container {
+  --primary-color: #10b981;
+}
+
+.theme-musician .ens-registration-container {
+  --primary-color: #8b5cf6;
+}
+
+.theme-sportsTeam .ens-registration-container {
+  --primary-color: #f59e0b;
+}
+
+/* Responsive Design */
+@media (max-width: 640px) {
+  .ens-registration-overlay {
+    padding: 16px;
+  }
+  
+  .ens-registration-container {
+    padding: 24px;
+    max-height: 95vh;
+  }
+  
+  .ens-registration-header h2 {
+    font-size: 24px;
+  }
+  
+  .ens-registration-header p {
+    font-size: 14px;
+  }
+  
+  .ens-name-input {
+    font-size: 16px;
+  }
+  
+  .ens-suffix {
+    font-size: 16px;
+  }
+}

@@ -9,7 +9,7 @@ contract EventManager is Ownable, IEventManager {
     Ticket public ticketNFT;
     uint256 public nextEventId;
 
-    enum Role { None, Fan, Musician }
+    enum Role { None, Fan, Musician, SportsTeam }
     enum LoyaltyTier { None, Gold }
 
     mapping(address => Role) public roles;
@@ -23,11 +23,12 @@ contract EventManager is Ownable, IEventManager {
         uint256 ticketPrice;
         uint256 maxTickets;
         uint256 ticketsSold;
-        uint256 eventDate;             // Actual concert date
+        uint256 eventDate;             // Actual event date
         bool cancelled;
         uint256 loyaltyStartTimestamp; // When Gold fans can start buying
         uint256 publicStartTimestamp;  // When everyone can start buying
         uint256 goldRequirement;       // # of events needed to reach Gold loyalty
+        IEventManager.EventType eventType;           // Performance or Sports
     }
 
     mapping(uint256 => EventData) public events;
@@ -46,6 +47,8 @@ contract EventManager is Ownable, IEventManager {
     error NotAllowedToBuyOwnTicket();
     error ForwardFailed();
     error AlreadyRegistered();
+    error InvalidRoleForEventType();
+    error OnlyFansCanBuyTickets();
 
     // 📢 Events
     event EventCreated(uint256 indexed eventId, address indexed organizer);
@@ -73,15 +76,31 @@ contract EventManager is Ownable, IEventManager {
         emit Registered(msg.sender, Role.Musician);
     }
 
+    function registerAsSportsTeam() external {
+        if (roles[msg.sender] != Role.None) revert AlreadyRegistered();
+        roles[msg.sender] = Role.SportsTeam;
+        emit Registered(msg.sender, Role.SportsTeam);
+    }
+
     // 🛠 Create an Event
     function createEvent(
         string memory metadataURI,
         uint256 ticketPrice,
         uint256 maxTickets,
         uint256 eventDate,
-        uint256 goldRequirement
+        uint256 goldRequirement,
+        IEventManager.EventType eventType
     ) external override {
         if (eventDate <= block.timestamp) revert EventInPast();
+        
+        // Role-based event type validation
+        Role organizerRole = roles[msg.sender];
+        if (eventType == IEventManager.EventType.Performance && organizerRole != Role.Musician) {
+            revert InvalidRoleForEventType();
+        }
+        if (eventType == IEventManager.EventType.Sports && organizerRole != Role.SportsTeam) {
+            revert InvalidRoleForEventType();
+        }
 
         uint256 loyaltyStart = block.timestamp;
         uint256 publicStart = loyaltyStart + 7 days;
@@ -98,7 +117,8 @@ contract EventManager is Ownable, IEventManager {
             cancelled: false,
             loyaltyStartTimestamp: loyaltyStart,
             publicStartTimestamp: publicStart,
-            goldRequirement: goldRequirement
+            goldRequirement: goldRequirement,
+            eventType: eventType
         });
 
         emit EventCreated(eventId, msg.sender);
@@ -107,6 +127,9 @@ contract EventManager is Ownable, IEventManager {
     // 🛒 Buy a Ticket
     function buyTicket(uint256 eventId) external payable override {
         EventData storage evt = events[eventId];
+
+        // Only fans can buy tickets
+        if (roles[msg.sender] != Role.Fan) revert OnlyFansCanBuyTickets();
 
         if (evt.cancelled) revert EventCancelled();
         if (block.timestamp >= evt.eventDate) revert EventInPast();

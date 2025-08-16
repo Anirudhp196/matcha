@@ -71,7 +71,7 @@ const ManageConcerts = () => {
         <div className="loyalty-settings">
           <div className="current-setting">
             <span className="setting-label">Current Requirement:</span>
-            <span className="setting-value">{goldRequirement} concerts</span>
+            <span className="setting-value">{goldRequirement} {isMatcha ? 'matches' : 'concerts'}</span>
           </div>
           <GoldRequirementSetter />
         </div>
@@ -93,7 +93,7 @@ const ManageConcerts = () => {
       <h2 className="form-title"><TicketIcon size={24} /> Your Events</h2>
       {loading ? (
         <div className="loading-events">
-          <LoadingSpinner size="large" text="Loading your concerts..." />
+          <LoadingSpinner size="large" text={`Loading your ${isMatcha ? 'matches' : 'concerts'}...`} />
         </div>
       ) : myEvents.length === 0 ? (
         <div className="no-events">

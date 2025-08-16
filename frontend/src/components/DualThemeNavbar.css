@@ -183,6 +183,18 @@
   color: #333;
 }
 
+.toggle-button.disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  background: rgba(100, 100, 100, 0.3) !important;
+}
+
+.toggle-button.disabled:hover {
+  transform: none;
+  background: rgba(100, 100, 100, 0.3) !important;
+  color: #666 !important;
+}
+
 /* Toggle Divider */
 .toggle-divider {
   position: relative;

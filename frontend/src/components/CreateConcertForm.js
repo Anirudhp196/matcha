@@ -11,7 +11,7 @@ const PINATA_API_KEY = "3bf4164172fae7b68de3";
 const PINATA_SECRET = "32288745dd22dabdcc87653918e33841ccfcfbd45c43a89709f873aedcc7c9fe";
 
 const CreateConcertForm = ({ onCreated }) => {
-  const { eventContract, address, goldRequirement, getDisplayName } = useWeb3();
+  const { eventContract, address, goldRequirement, getDisplayName, role } = useWeb3();
   const { theme } = useTheme();
   const isMatcha = theme === 'matcha';
   const [form, setForm] = useState({
@@ -106,8 +106,18 @@ const CreateConcertForm = ({ onCreated }) => {
     e.preventDefault();
     console.log("CreateConcert: Using updated version without artistName requirement");
     console.log("Display name:", getDisplayName());
+    console.log("Hello World!")
     
     if (!eventContract || !address) return toast.error("Connect your wallet first!");
+    
+    // Role-based validation
+    if (isMatcha && role !== 'sportsTeam') {
+      return toast.error("Only sports teams can create matches!");
+    }
+    if (!isMatcha && role !== 'musician') {
+      return toast.error("Only musicians can create concerts!");
+    }
+    
     if (!image) return toast.error("Please upload an image!");
     if (!form.price) return toast.error("Enter a valid ticket price.");
     // Artist name is automatically determined from wallet address or ENS
@@ -136,12 +146,16 @@ const CreateConcertForm = ({ onCreated }) => {
         isUploading: true
       });
       
+      // Determine event type based on user role and theme
+      const eventType = (role === 'sportsTeam' || isMatcha) ? 1 : 0; // 1 = Sports, 0 = Performance
+
       const tx = await eventContract.createEvent(
         metadataURI,
         ethers.utils.parseEther(form.price.toString()),
         parseInt(form.totalSupply),
         eventDateTimestamp,
-        currentGoldRequirement
+        currentGoldRequirement,
+        eventType
       );
       
       setUploadProgress({
@@ -170,6 +184,31 @@ const CreateConcertForm = ({ onCreated }) => {
   };
 
   const isFormValid = form.name && form.description && form.price && form.totalSupply && form.date && form.location && image;
+  
+  // Check if user has permission to create events on this side
+  const canCreateEvents = isMatcha ? role === 'sportsTeam' : role === 'musician';
+
+  if (!canCreateEvents) {
+    return (
+      <div className="access-restricted" style={{
+        padding: '2rem',
+        textAlign: 'center',
+        backgroundColor: 'rgba(255, 255, 255, 0.05)',
+        border: '1px solid rgba(255, 100, 100, 0.3)',
+        borderRadius: '12px',
+        margin: '2rem 0'
+      }}>
+        <h2 style={{color: '#ff6b6b', marginBottom: '1rem'}}>Access Restricted</h2>
+        <p style={{marginBottom: '0.5rem'}}>
+          {isMatcha 
+            ? "Only Sports Teams can create matches on the Match-a side." 
+            : "Only Musicians can create concerts on the Performative side."
+          }
+        </p>
+        <p>Your current role: <strong>{role || 'None'}</strong></p>
+      </div>
+    );
+  }
 
   return (
     <>

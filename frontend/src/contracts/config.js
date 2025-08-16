@@ -18,19 +18,26 @@ export const CONTRACTS = {
   }
 };
 
-// Network configuration
+// Network configuration for Privy
 export const NETWORK_CONFIG = {
-  chainId: 88882,
+  id: 88882,
   name: "Chiliz Spicy Testnet",
-  network: "chiliz-spicy-testnet",
-  nativeCurrency: { name: "CHZ", symbol: "CHZ", decimals: 18 },
-  rpcUrls: { default: { http: ["https://spicy-rpc.chiliz.com"] } },
+  nativeCurrency: { 
+    name: "CHZ", 
+    symbol: "CHZ", 
+    decimals: 18 
+  },
+  rpcUrls: {
+    default: {
+      http: ["https://spicy-rpc.chiliz.com"]
+    }
+  },
   blockExplorers: {
     default: {
       name: "ChilizScan",
-      url: "https://testnet.chiliscan.com",
-    },
-  },
+      url: "https://testnet.chiliscan.com"
+    }
+  }
 };
 
 // Export individual addresses for convenience

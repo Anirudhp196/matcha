@@ -136,12 +136,70 @@ export const useEns = () => {
     setError(null);
   }, []);
 
+  // Check if an ENS name is available for registration
+  const checkAvailability = useCallback(async (name) => {
+    if (!name || name.length < 3) {
+      throw new Error("Name must be at least 3 characters long");
+    }
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const cleanName = name.toLowerCase().replace(/\.eth$/, "");
+      const response = await fetch(`${API_BASE}/api/ens-available/${cleanName}`);
+      
+      if (!response.ok) {
+        throw new Error(`ENS availability check failed: ${response.status}`);
+      }
+
+      const data = await response.json();
+      return data.available;
+    } catch (err) {
+      const errorMessage = err.message || "ENS availability check failed";
+      setError(errorMessage);
+      throw new Error(errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  // Get registration cost for an ENS name
+  const getRegistrationCost = useCallback(async (name, duration = 1) => {
+    if (!name || name.length < 3) {
+      throw new Error("Invalid name");
+    }
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const cleanName = name.toLowerCase().replace(/\.eth$/, "");
+      const response = await fetch(`${API_BASE}/api/ens-cost/${cleanName}/${duration}`);
+      
+      if (!response.ok) {
+        throw new Error(`ENS cost lookup failed: ${response.status}`);
+      }
+
+      const data = await response.json();
+      return data.cost;
+    } catch (err) {
+      const errorMessage = err.message || "ENS cost lookup failed";
+      setError(errorMessage);
+      throw new Error(errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   return {
     loading,
     error,
     lookupName,
     lookupProfile,
     lookupComplete,
+    checkAvailability,
+    getRegistrationCost,
     shortenAddress,
     clearError,
     isEthAddress

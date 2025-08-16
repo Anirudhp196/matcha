@@ -48,11 +48,16 @@ const DualThemeNavbar = () => {
             {/* Match-a Button (Sports) */}
             <button
               onClick={() => {
-                if (!isMatcha) {
+                // Only allow switch to Match-a if user is fan or sports team
+                if (!isMatcha && (role === 'fan' || role === 'sportsTeam')) {
                   toggleTheme();
                 }
               }}
-              className={`toggle-button ${isMatcha ? 'active' : ''}`}
+              className={`toggle-button ${isMatcha ? 'active' : ''} ${
+                role !== 'fan' && role !== 'sportsTeam' ? 'disabled' : ''
+              }`}
+              disabled={role !== 'fan' && role !== 'sportsTeam'}
+              title={role === 'musician' ? 'Musicians can only access the Performative side' : ''}
             >
               <span><MatchaIcon size={16} /> Match-a</span>
             </button>
@@ -63,11 +68,16 @@ const DualThemeNavbar = () => {
             {/* Performative Button (Concerts) */}
             <button
               onClick={() => {
-                if (isMatcha) {
+                // Only allow switch to Performative if user is fan or musician
+                if (isMatcha && (role === 'fan' || role === 'musician')) {
                   toggleTheme();
                 }
               }}
-              className={`toggle-button ${!isMatcha ? 'active' : ''}`}
+              className={`toggle-button ${!isMatcha ? 'active' : ''} ${
+                role !== 'fan' && role !== 'musician' ? 'disabled' : ''
+              }`}
+              disabled={role !== 'fan' && role !== 'musician'}
+              title={role === 'sportsTeam' ? 'Sports Teams can only access the Match-a side' : ''}
             >
               <span><MusicPerformanceIcon size={16} /> Performative</span>
             </button>
@@ -83,10 +93,10 @@ const DualThemeNavbar = () => {
               </Link>
               {role === "fan" && (
                 <Link to="/manage-tickets" className={`nav-link ${isActive('/manage-tickets')}`}>
-                  Your {isMatcha ? 'Tickets' : 'Tickets'}
+                  Your {isMatcha ? 'Tickets' : 'Tickets'} & Profile
                 </Link>
               )}
-              {role === "musician" && (
+              {(role === "musician" || role === "sportsTeam") && (
                 <Link to="/manage-concerts" className={`nav-link ${isActive('/manage-concerts')}`}>
                   Manage {isMatcha ? 'Matches' : 'Concerts'}
                 </Link>
@@ -100,7 +110,8 @@ const DualThemeNavbar = () => {
           {address && (
             <div className="user-role">
               <span className={`role-badge ${role} ${isMatcha ? 'matcha' : 'performative'}`}>
-                {role === "musician" ? (isMatcha ? "Team Manager" : "Musician") : "Fan"}
+                {role === "musician" ? (isMatcha ? "Team Manager" : "Musician") : 
+                 role === "sportsTeam" ? "Sports Team" : "Fan"}
               </span>
             </div>
           )}
@@ -137,7 +148,7 @@ const DualThemeNavbar = () => {
                 Your Tickets
               </Link>
             )}
-            {role === "musician" && (
+            {(role === "musician" || role === "sportsTeam") && (
               <Link 
                 to="/manage-concerts" 
                 className={`mobile-nav-link ${isActive('/manage-concerts')}`}

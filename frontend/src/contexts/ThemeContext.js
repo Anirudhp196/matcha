@@ -21,13 +21,23 @@ export const ThemeProvider = ({ children }) => {
     setTheme(newTheme);
   };
 
+  // Function to set initial theme based on role
+  const setInitialThemeForRole = (role) => {
+    if (role === 'sportsTeam') {
+      setTheme('matcha'); // Sports teams must start on Match-a side
+    } else if (role === 'musician') {
+      setTheme('performative'); // Musicians must start on Performative side
+    }
+    // Fans can start on either side (default performative)
+  };
+
   // Apply theme to body element
   React.useEffect(() => {
     document.body.className = `theme-${theme}`;
   }, [theme]);
 
   return (
-    <ThemeContext.Provider value={{ theme, toggleTheme, changeTheme }}>
+    <ThemeContext.Provider value={{ theme, toggleTheme, changeTheme, setInitialThemeForRole }}>
       <div className={`theme-${theme}`}>
         {children}
       </div>

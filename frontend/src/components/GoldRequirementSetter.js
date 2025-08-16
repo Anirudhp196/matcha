@@ -1,15 +1,22 @@
 import React, { useState } from "react";
 import { useWeb3 } from "../contexts/Web3Context";
+import { useTheme } from "../contexts/ThemeContext";
 import { toast } from "react-hot-toast";
 import LoadingSpinner from "./LoadingSpinner";
 import "./GoldRequirementSetter.css";
 
 const GoldRequirementSetter = () => {
   const { goldRequirement, setGoldRequirement, role, address, eventContract } = useWeb3();
+  const { theme } = useTheme();
   const [inputValue, setInputValue] = useState(goldRequirement || 0);
   const [isUpdating, setIsUpdating] = useState(false);
 
-  if (role !== "musician") return null; // Only musicians see this
+  const isMatcha = theme === 'matcha';
+  const eventTypeText = isMatcha ? 'match' : 'concert';
+  const eventTypeTextPlural = isMatcha ? 'matches' : 'concerts';
+
+  // Only show for event creators (musicians and sports teams)
+  if (role !== "musician" && role !== "sportsTeam") return null;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -30,7 +37,7 @@ const GoldRequirementSetter = () => {
         localStorage.setItem(`mosh-gold-req-${address}`, parsed.toString());
       }
       
-      toast.success(`Gold status now requires ${parsed} concert${parsed === 1 ? '' : 's'}`);
+      toast.success(`Gold status now requires ${parsed} ${parsed === 1 ? eventTypeText : eventTypeTextPlural}`);
     } catch (error) {
       console.error("Failed to update gold requirement:", error);
       toast.error("Failed to update gold requirement");
@@ -45,7 +52,7 @@ const GoldRequirementSetter = () => {
         <input
           type="number"
           min="0"
-          placeholder="Enter number of concerts"
+          placeholder={`Enter number of ${eventTypeTextPlural}`}
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
           required

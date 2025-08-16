@@ -2,15 +2,19 @@ import React, { useEffect, useState } from "react";
 import { useWeb3 } from "../contexts/Web3Context";
 import { useTheme } from "../contexts/ThemeContext";
 import { useTickets } from "../hooks/useTickets";
+import { usePrivy } from "@privy-io/react-auth";
 import { ethers } from "ethers";
 import { toast } from "react-hot-toast";
 import LoadingSpinner from "../components/LoadingSpinner";
+import SecuritySettings from "../components/SecuritySettings";
+import FundWalletButton from "../components/FundWalletButton";
 import { TicketIcon } from "../components/Icons";
 import "./ManageTickets.css";
 import "../components/EventCard.css";
 
 const ManageTickets = () => {
-  const { ticketContract, marketplaceContract, eventContract } = useWeb3();
+  const { ticketContract, marketplaceContract, eventContract, address, getDisplayName, role, ensName, ensAvatar, disconnectWallet } = useWeb3();
+  const { user } = usePrivy();
   const { theme } = useTheme();
   const { tickets, loading, refetch } = useTickets();
   const [prices, setPrices] = useState({});
@@ -18,8 +22,28 @@ const ManageTickets = () => {
   const [currentTokenId, setCurrentTokenId] = useState(null);
   const [ticketDetails, setTicketDetails] = useState({});
   const [loadingDetails, setLoadingDetails] = useState(false);
+  const [filteredTickets, setFilteredTickets] = useState([]);
 
   const isMatcha = theme === 'matcha';
+
+  // Filter tickets based on current theme
+  useEffect(() => {
+    if (!tickets || !tickets.length) {
+      setFilteredTickets([]);
+      return;
+    }
+
+    const filtered = tickets.filter(ticket => {
+      // EventType: 0 = Performance, 1 = Sports
+      if (isMatcha) {
+        return ticket.eventType === 1; // Show only sports tickets on Match-a side
+      } else {
+        return ticket.eventType === 0; // Show only performance tickets on Performative side
+      }
+    });
+
+    setFilteredTickets(filtered);
+  }, [tickets, isMatcha]);
 
   useEffect(() => {
     const fetchTicketDetails = async () => {
@@ -113,21 +137,28 @@ const ManageTickets = () => {
   return (
     <div className={`manage-tickets-container theme-${theme}`}>
       <h1 className={`page-title ${isMatcha ? 'matcha' : 'performative'}`}>
-        🎟 Your Tickets
+        🎟 Your {isMatcha ? 'Sports Match' : 'Concert'} Tickets
       </h1>
 
       {loading || loadingDetails ? (
         <div className="loading-tickets">
           <LoadingSpinner size="large" text="Loading your tickets..." />
         </div>
-      ) : tickets.length === 0 ? (
+      ) : filteredTickets.length === 0 ? (
         <div className="no-tickets">
-          <p className={`glow-text ${isMatcha ? 'matcha' : 'performative'}`}>No tickets owned yet.</p>
-          <p className="ticket-help-text">Purchase tickets from the events page to see them here.</p>
+          <p className={`glow-text ${isMatcha ? 'matcha' : 'performative'}`}>
+            No {isMatcha ? 'sports match' : 'concert'} tickets owned yet.
+          </p>
+          <p className="ticket-help-text">
+            Purchase {isMatcha ? 'match' : 'concert'} tickets from the events page to see them here.
+            {tickets.length > 0 && (
+              <span> You have {tickets.length - filteredTickets.length} tickets for {isMatcha ? 'concerts' : 'sports matches'} on the other side.</span>
+            )}
+          </p>
         </div>
       ) : (
         <div className="ticket-grid">
-          {tickets.map((t) => {
+          {filteredTickets.map((t) => {
             const details = ticketDetails[t.tokenId];
             const imageURL = details?.image || t.uri.replace("ipfs://", "https://ipfs.io/ipfs/") || "https://via.placeholder.com/400x200.png?text=Ticket";
 
@@ -199,6 +230,61 @@ const ManageTickets = () => {
           })}
         </div>
       )}
+
+      {/* Profile Section */}
+      <div className="profile-section">
+        <div className="profile-header">
+          <div className="profile-avatar">
+            {ensAvatar ? (
+              <img src={ensAvatar} alt="Profile" />
+            ) : (
+              <div className="default-avatar">
+                {getDisplayName()?.charAt(0)?.toUpperCase() || '?'}
+              </div>
+            )}
+          </div>
+          <div className="profile-info">
+            <h1>{getDisplayName()}</h1>
+            <div className="role-badge">{role}</div>
+            {user?.email && <p className="email">{user.email.address}</p>}
+            <p className="address">{address}</p>
+            <button className="disconnect-btn" onClick={disconnectWallet}>
+              🔌 Disconnect Wallet
+            </button>
+          </div>
+        </div>
+
+        <div className="profile-sections">
+          <section className="wallet-section">
+            <h2>💰 Wallet Management</h2>
+            <div className="wallet-actions-container">
+              <FundWalletButton className="fund-btn-large" />
+              <div className="wallet-info">
+                <p>Add funds to your wallet using credit card or transfer from exchanges.</p>
+                <p>This helps you pay for gas fees when our sponsorship isn't available.</p>
+              </div>
+            </div>
+          </section>
+
+          <SecuritySettings />
+
+          <section className="preferences-section">
+            <h2>⚙️ Preferences</h2>
+            <div className="preference-item">
+              <label>
+                <input type="checkbox" defaultChecked />
+                Email notifications for ticket purchases
+              </label>
+            </div>
+            <div className="preference-item">
+              <label>
+                <input type="checkbox" defaultChecked />
+                Show gas sponsorship notifications
+              </label>
+            </div>
+          </section>
+        </div>
+      </div>
     </div>
   );
 };

@@ -74,4 +74,46 @@ async function getENSProfile(address) {
   return { address, name, avatar: processedAvatar, description, url, twitter, github };
 }
 
-module.exports = { getENSName, getENSProfile }; 
+/**
+ * Checks if an ENS name is available for registration.
+ * @param {string} name - The ENS name to check (without .eth).
+ * @returns {Promise<boolean>} - True if available, false if not.
+ */
+async function checkENSAvailability(name) {
+  try {
+    // Create registrar contract instance
+    const registrarContract = new ethers.Contract("0x283Af0B28c62C092C9727F1Ee09c02CA627EB7F5", [
+      "function available(string calldata name) external view returns (bool)"
+    ], provider);
+    
+    const available = await registrarContract.available(name);
+    return available;
+  } catch (err) {
+    console.error("ENS availability check error:", err);
+    return false;
+  }
+}
+
+/**
+ * Gets the registration cost for an ENS name.
+ * @param {string} name - The ENS name to check (without .eth).
+ * @param {number} duration - Duration in years.
+ * @returns {Promise<string|null>} - Cost in wei as string, or null if error.
+ */
+async function getENSRegistrationCost(name, duration = 1) {
+  try {
+    // Create registrar contract instance
+    const registrarContract = new ethers.Contract("0x283Af0B28c62C092C9727F1Ee09c02CA627EB7F5", [
+      "function rentPrice(string calldata name, uint256 duration) external view returns (uint256)"
+    ], provider);
+    
+    const durationInSeconds = duration * 365 * 24 * 60 * 60;
+    const cost = await registrarContract.rentPrice(name, durationInSeconds);
+    return cost.toString();
+  } catch (err) {
+    console.error("ENS cost check error:", err);
+    return null;
+  }
+}
+
+module.exports = { getENSName, getENSProfile, checkENSAvailability, getENSRegistrationCost }; 

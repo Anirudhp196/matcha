@@ -23,7 +23,7 @@ const BrowseEvents = () => {
     setIsGuestUser(!address);
   }, [address]);
 
-  // Filter events based on theme
+  // Filter events based on theme using eventType from smart contract
   useEffect(() => {
     if (!events) {
       setFilteredEvents([]);
@@ -31,40 +31,15 @@ const BrowseEvents = () => {
     }
 
     const filtered = events.filter(event => {
-      // Check metadata for category
-      const category = event.metadata?.attributes?.find(
-        attr => attr.trait_type === "Category"
-      )?.value?.toLowerCase();
-      
-      const eventName = event.metadata?.name?.toLowerCase() || "";
-      const eventDescription = event.metadata?.description?.toLowerCase() || "";
+      // Use eventType from smart contract: 0 = Performance, 1 = Sports
+      console.log(`Event ${event.id}: ${event.metadata?.name}, eventType: ${event.eventType}, isMatcha: ${isMatcha}`);
       
       if (isMatcha) {
-        // Sports-related keywords
-        const sportsKeywords = ['match', 'game', 'football', 'soccer', 'basketball', 
-                               'baseball', 'tennis', 'cricket', 'rugby', 'hockey',
-                               'tournament', 'championship', 'league', 'sports', 
-                               'athletic', 'esports', 'racing', 'golf'];
-        
-        return category === 'sports' || 
-               sportsKeywords.some(keyword => 
-                 eventName.includes(keyword) || 
-                 eventDescription.includes(keyword)
-               );
+        // Show sports events (eventType = 1) on Match-a side
+        return event.eventType === 1;
       } else {
-        // Entertainment-related keywords
-        const entertainmentKeywords = ['concert', 'music', 'band', 'artist', 'show',
-                                      'performance', 'festival', 'comedy', 'theater',
-                                      'theatre', 'opera', 'ballet', 'dance', 'dj',
-                                      'live', 'tour', 'gig', 'recital', 'orchestra'];
-        
-        return category === 'entertainment' || 
-               category === 'concert' ||
-               !category || // If no category, default to entertainment
-               entertainmentKeywords.some(keyword => 
-                 eventName.includes(keyword) || 
-                 eventDescription.includes(keyword)
-               );
+        // Show performance events (eventType = 0) on Performative side
+        return event.eventType === 0;
       }
     });
     
@@ -79,11 +54,15 @@ const BrowseEvents = () => {
       setTxPending(true);
       const tx = await eventContract.buyTicket(eventId, { value: price });
       await tx.wait();
-      toast.success("Ticket purchased!");
+      toast.success(`${isMatcha ? 'Match' : 'Concert'} ticket purchased!`);
       refetch();
     } catch (err) {
       console.error("Ticket purchase failed:", err);
-      toast.error("Purchase failed!");
+      if (err.message.includes("OnlyFansCanBuyTickets")) {
+        toast.error("Only fans can purchase tickets!");
+      } else {
+        toast.error("Purchase failed!");
+      }
     } finally {
       setTxPending(false);
     }
