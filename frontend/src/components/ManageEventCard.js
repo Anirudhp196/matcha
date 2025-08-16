@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { ethers } from "ethers";
 import { useNavigate } from "react-router-dom";
 import LoadingSpinner from "./LoadingSpinner";
+import { ArtistIcon, LocationIcon, CalendarIcon, TicketIcon, MoneyIcon, MarketplaceIcon } from "./Icons";
 import "./EventCard.css"; // Reuse styling
 import "./ManageEventCard.css"; // Add specific styling
 
@@ -64,16 +65,16 @@ const ManageEventCard = ({ event, onCancel, onUpdate }) => {
       <div className="event-details">
         <h3 className="event-title">{name}</h3>
         
-        <p className="artist-name">🎤 {artistName}</p>
-        <p className="location-name">📍 {location}</p>
-        <p className="date-name">🗓 {formattedDate}</p>
+        <p className="artist-name"><ArtistIcon size={16} /> {artistName}</p>
+        <p className="location-name"><LocationIcon size={16} /> {location}</p>
+        <p className="date-name"><CalendarIcon size={16} /> {formattedDate}</p>
         
         <div className="event-ticket-info">
-          <p className="ticket-sold">🎫 {sold} / {supply} sold</p>
+          <p className="ticket-sold"><TicketIcon size={16} /> {sold} / {supply} sold</p>
         </div>
 
         <div className="price-section">
-          💰 <span className="price-text">{formattedPrice}</span>
+          <MoneyIcon size={16} /> <span className="price-text">{formattedPrice}</span>
         </div>
 
         {/* Only show buttons if the event is not cancelled */}
@@ -102,7 +103,7 @@ const ManageEventCard = ({ event, onCancel, onUpdate }) => {
               className="resell-button"
               onClick={() => navigate(`/marketplace/${id}`)}
             >
-              🔁 View Marketplace
+              <MarketplaceIcon size={16} /> View Marketplace
             </button>
           </>
         )}

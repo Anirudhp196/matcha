@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useWeb3 } from "../contexts/Web3Context";
 import { useTheme } from "../contexts/ThemeContext";
 import LoadingSpinner from "./LoadingSpinner";
+import { ArtistIcon, LocationIcon, CalendarIcon, TicketIcon, MoneyIcon, BuyIcon, ConnectIcon, MarketplaceIcon } from "./Icons";
 import "./EventCard.css";
 
 const EventCard = ({ event, onBuy, showBuyButton = true, isGuestUser = false }) => {
@@ -110,15 +111,15 @@ const EventCard = ({ event, onBuy, showBuyButton = true, isGuestUser = false }) 
 
       <div className="event-details">
         <h3 className="event-title">{name}</h3>
-        <p className="artist-name">🎤 {artistName}</p>
-        <p className="location-name">📍 {location}</p>
-        <p className="date-name">🗓 {formattedDate}</p>
+        <p className="artist-name"><ArtistIcon size={16} /> {artistName}</p>
+        <p className="location-name"><LocationIcon size={16} /> {location}</p>
+        <p className="date-name"><CalendarIcon size={16} /> {formattedDate}</p>
         <div className="event-ticket-info">
-          <p className="ticket-sold">🎫 {soldOut ? "SOLD OUT" : `${supply - sold} tickets available`}</p>
+          <p className="ticket-sold"><TicketIcon size={16} /> {soldOut ? "SOLD OUT" : `${supply - sold} tickets available`}</p>
         </div>
 
         <div className="price-section">
-          💰 <span className="price-text">{formattedPrice}</span>
+          <MoneyIcon size={16} /> <span className="price-text">{formattedPrice}</span>
         </div>
 
         {/* Only show buttons if event is not cancelled */}
@@ -137,7 +138,7 @@ const EventCard = ({ event, onBuy, showBuyButton = true, isGuestUser = false }) 
                       <LoadingSpinner size="small" />
                       <span>Buying...</span>
                     </span>
-                  ) : "🌀 Buy Ticket"
+                  ) : (<><BuyIcon size={16} /> Buy Ticket</>)
                 )}
               </button>
             )}
@@ -154,14 +155,14 @@ const EventCard = ({ event, onBuy, showBuyButton = true, isGuestUser = false }) 
                     <LoadingSpinner size="small" />
                     <span>Connecting...</span>
                   </span>
-                ) : "🔌 Connect Wallet"}
+                ) : (<><ConnectIcon size={16} /> Connect Wallet</>)}
               </button>
             ) : (
               <button
                 className="resell-button"
                 onClick={() => navigate(`/marketplace/${id}`)}
               >
-                🔁 View Marketplace
+                <MarketplaceIcon size={16} /> View Marketplace
               </button>
             )}
           </>

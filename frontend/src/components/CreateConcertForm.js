@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useWeb3 } from "../contexts/Web3Context";
+import { useTheme } from "../contexts/ThemeContext";
 import { ethers } from "ethers";
 import axios from "axios";
 import { toast } from "react-hot-toast";
@@ -37,7 +38,7 @@ const CreateConcertForm = ({ onCreated }) => {
 
   const uploadToPinata = async () => {
     setUploadProgress({
-      stage: "Uploading concert image to IPFS",
+      stage: isMatcha ? "Uploading game image to IPFS" : "Uploading concert image to IPFS",
       percent: 10,
       isUploading: true
     });
@@ -55,7 +56,7 @@ const CreateConcertForm = ({ onCreated }) => {
     });
 
     setUploadProgress({
-      stage: "Preparing concert metadata",
+      stage: isMatcha ? "Preparing game metadata" : "Preparing concert metadata",
       percent: 40,
       isUploading: true
     });
@@ -74,7 +75,7 @@ const CreateConcertForm = ({ onCreated }) => {
     };
 
     setUploadProgress({
-      stage: "Uploading concert metadata to IPFS",
+      stage: isMatcha ? "Uploading game metadata to IPFS" : "Uploading concert metadata to IPFS",
       percent: 70,
       isUploading: true
     });
@@ -91,7 +92,7 @@ const CreateConcertForm = ({ onCreated }) => {
     );
 
     setUploadProgress({
-      stage: "Concert data stored successfully",
+      stage: isMatcha ? "Game data stored successfully" : "Concert data stored successfully",
       percent: 100,
       isUploading: true
     });
@@ -113,7 +114,7 @@ const CreateConcertForm = ({ onCreated }) => {
     const eventDate = new Date(form.date);
     const currentDate = new Date();
     if (eventDate <= currentDate) {
-      return toast.error("Concert date must be in the future!");
+      return toast.error(isMatcha ? "Game date must be in the future!" : "Concert date must be in the future!");
     }
 
     try {
@@ -128,7 +129,7 @@ const CreateConcertForm = ({ onCreated }) => {
       const currentGoldRequirement = goldRequirement;
       
       setUploadProgress({
-        stage: "Creating your concert on the blockchain",
+        stage: isMatcha ? "Creating your game on the blockchain" : "Creating your concert on the blockchain",
         percent: 100,
         isUploading: true
       });
@@ -149,13 +150,13 @@ const CreateConcertForm = ({ onCreated }) => {
       
       await tx.wait();
 
-      toast.success("Concert created!");
+      toast.success(isMatcha ? "Game created!" : "Concert created!");
       setForm({ name: "", description: "", price: "", totalSupply: "", date: "", location: "" });
       setImage(null);
       if (onCreated) onCreated();
     } catch (err) {
       console.error("Create failed:", err);
-      toast.error("Failed to create concert.");
+      toast.error(isMatcha ? "Failed to create game." : "Failed to create concert.");
     } finally {
       setLoading(false);
       setUploadProgress({
@@ -186,9 +187,9 @@ const CreateConcertForm = ({ onCreated }) => {
         </div>
       )}
       
-      <form onSubmit={createConcert} className="concert-form">
+      <form onSubmit={createConcert} className={`concert-form ${isMatcha ? 'matcha-theme' : 'performative-theme'}`}>
         <div className="form-group">
-          <label htmlFor="name">Concert Name</label>
+          <label htmlFor="name">{isMatcha ? 'Game Name' : 'Concert Name'}</label>
           <input 
             id="name" 
             type="text" 
@@ -201,7 +202,7 @@ const CreateConcertForm = ({ onCreated }) => {
         </div>
         
         <div className="form-group">
-          <label htmlFor="description">Concert Description</label>
+          <label htmlFor="description">{isMatcha ? 'Game Description' : 'Concert Description'}</label>
           <textarea 
             id="description" 
             name="description" 
@@ -271,7 +272,7 @@ const CreateConcertForm = ({ onCreated }) => {
         </div>
         
         <div className="form-group">
-          <label htmlFor="concertImage">Concert Image</label>
+          <label htmlFor="concertImage">{isMatcha ? 'Game Image' : 'Concert Image'}</label>
           <input 
             id="concertImage" 
             type="file" 
@@ -286,10 +287,10 @@ const CreateConcertForm = ({ onCreated }) => {
           {loading ? (
             <span className="button-loading">
               <LoadingSpinner size="small" />
-              <span>Creating Concert...</span>
+              <span>{isMatcha ? 'Creating Game...' : 'Creating Concert...'}</span>
             </span>
           ) : (
-            "🚀 Launch Concert"
+            isMatcha ? "🚀 Launch Game" : "🚀 Launch Concert"
           )}
         </button>
       </form>

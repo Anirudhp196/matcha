@@ -19,6 +19,15 @@
     font-weight: bold;
 }
 
+.page-title svg {
+    display: block;
+    transition: all 0.3s ease;
+}
+
+.page-title:hover svg {
+    transform: scale(1.1);
+}
+
 .glow-text {
     color: #00ffe7;
     text-shadow: 0 0 5px #00ffe7;

@@ -5,6 +5,7 @@ import { useWeb3 } from "../contexts/Web3Context";
 import { useTheme } from "../contexts/ThemeContext";
 import { toast } from "react-hot-toast";
 import LoadingSpinner from "../components/LoadingSpinner";
+import { ArtistIcon, LocationIcon, CalendarIcon, TicketIcon, MoneyIcon } from "../components/Icons";
 import "./MarketplaceView.css";
 
 const MarketplacePage = () => {
@@ -96,11 +97,11 @@ const MarketplacePage = () => {
       await tx.wait();
       
       toast.dismiss();
-      toast.success("🎟️ Ticket purchased!");
+      toast.success("Ticket purchased successfully!");
       fetchMarketplace();
     } catch (err) {
       console.error("Buy failed:", err);
-      toast.error("❌ Failed to buy ticket.");
+      toast.error("Failed to buy ticket.");
     } finally {
       setBuying(false);
       setCurrentTokenId(null);
@@ -118,7 +119,7 @@ const MarketplacePage = () => {
       </button>
       
       <h1 className={`page-title ${isMatcha ? 'matcha' : 'performative'}`}>
-        🎟 Secondary Marketplace
+        <TicketIcon size={24} /> Secondary Marketplace
       </h1>
       
       {eventDetails && (
@@ -128,11 +129,11 @@ const MarketplacePage = () => {
           </div>
           <div className="event-info">
             <h2>{eventDetails.name}</h2>
-            <p className="artist-detail">🎤 {eventDetails.artist}</p>
-            <p className="location-detail">📍 {eventDetails.location}</p>
-            <p className="date-detail">🗓 {eventDetails.date}</p>
-            <p className="ticket-detail">🎫 {eventDetails.ticketsSold} / {eventDetails.maxTickets} tickets sold</p>
-            <p className="price-detail">💰 {formatEther(eventDetails.price)} CHZ (original price)</p>
+            <p className="artist-detail"><ArtistIcon size={16} /> {eventDetails.artist}</p>
+            <p className="location-detail"><LocationIcon size={16} /> {eventDetails.location}</p>
+            <p className="date-detail"><CalendarIcon size={16} /> {eventDetails.date}</p>
+            <p className="ticket-detail"><TicketIcon size={16} /> {eventDetails.ticketsSold} / {eventDetails.maxTickets} tickets sold</p>
+            <p className="price-detail"><MoneyIcon size={16} /> {formatEther(eventDetails.price)} CHZ (original price)</p>
           </div>
         </div>
       )}

@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { useWeb3 } from '../contexts/Web3Context';
 import { useTheme } from '../contexts/ThemeContext';
 import WalletButton from './WalletButton';
+import { MatchaIcon, MusicPerformanceIcon } from './Icons';
 import './DualThemeNavbar.css';
 
 const DualThemeNavbar = () => {
@@ -29,10 +30,10 @@ const DualThemeNavbar = () => {
         {/* Logo Section */}
         <Link to="/" className="logo-container">
           <div className="logo-icon">
-            {isMatcha ? '⚽' : '🎧'}
+            {isMatcha ? <MatchaIcon size={32} /> : <MusicPerformanceIcon size={32} />}
           </div>
           <h1 className="brand-title">
-            match-a | performative
+            Matcha
           </h1>
         </Link>
 
@@ -53,7 +54,7 @@ const DualThemeNavbar = () => {
               }}
               className={`toggle-button ${isMatcha ? 'active' : ''}`}
             >
-              <span>⚽ Match-a</span>
+              <span><MatchaIcon size={16} /> Match-a</span>
             </button>
 
             {/* Divider */}
@@ -68,7 +69,7 @@ const DualThemeNavbar = () => {
               }}
               className={`toggle-button ${!isMatcha ? 'active' : ''}`}
             >
-              <span>🎧 Performative</span>
+              <span><MusicPerformanceIcon size={16} /> Performative</span>
             </button>
           </div>
         </div>

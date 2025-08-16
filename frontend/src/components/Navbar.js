@@ -2,6 +2,7 @@ import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useWeb3 } from "../contexts/Web3Context";
 import WalletButton from "./WalletButton";
+import { MusicPerformanceIcon } from "./MusicPerformanceIcon";
 import "./Navbar.css";
 
 const Navbar = () => {
@@ -22,7 +23,7 @@ const Navbar = () => {
     <div className="navbar-container">
       <div className="navbar-content">
         <Link to="/" className="logo-container">
-          <div className="logo-icon">🎧</div>
+          <div className="logo-icon"><MusicPerformanceIcon size={32} /></div>
           <h1 className="mosh-title">Mosh</h1>
         </Link>
 

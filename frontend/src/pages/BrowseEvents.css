@@ -16,7 +16,7 @@ body {
 }
 
 .theme-performative {
-    background: linear-gradient(135deg, rgba(139, 0, 0, 0.1) 0%, rgba(54, 69, 79, 0.1) 100%);
+    background: rgba(30, 30, 40, 0.05);
 }
 
 .page-title {
@@ -29,14 +29,26 @@ body {
     transition: all 0.5s ease;
 }
 
+/* SVG Icon Styles for page titles */
+.page-title svg {
+    display: block;
+    transition: all 0.3s ease;
+}
+
+.page-title:hover svg {
+    transform: scale(1.1);
+}
+
 .page-title.matcha {
-    color: #2D5016;
-    text-shadow: 0 0 6px rgba(45, 80, 22, 0.3), 0 0 12px rgba(45, 80, 22, 0.2);
+    color: #5a7a76;
+    text-shadow: none;
+    font-weight: 600;
 }
 
 .page-title.performative {
-    color: #FF1493;
-    text-shadow: 0 0 6px rgba(255, 20, 147, 0.3), 0 0 12px rgba(255, 20, 147, 0.2);
+    color: #e8f0ef;
+    text-shadow: none;
+    font-weight: 600;
 }
 
 /* Keep old class for backward compatibility */
@@ -63,8 +75,8 @@ body {
 }
 
 .glow-text.performative {
-    color: #FF1493;
-    text-shadow: 0 0 6px rgba(255, 20, 147, 0.3), 0 0 10px rgba(255, 20, 147, 0.2);
+    color: #B565A7;
+    text-shadow: 0 0 3px rgba(181, 101, 167, 0.2);
 }
 
 .event-grid {
@@ -153,10 +165,10 @@ body {
 }
 
 .guest-banner.performative {
-    background: linear-gradient(90deg, rgba(139, 0, 0, 0.2), rgba(255, 20, 147, 0.2));
-    border: 1px solid #FF1493;
-    box-shadow: 0 0 15px rgba(255, 20, 147, 0.3);
-    animation: glowPerformative 2s ease-in-out infinite alternate;
+    background: rgba(60, 60, 70, 0.3);
+    border: 1px solid #8B4789;
+    box-shadow: 0 0 8px rgba(139, 71, 137, 0.2);
+    animation: none;
 }
 
 .guest-banner p {
@@ -164,6 +176,15 @@ body {
     font-size: 1.1rem;
     text-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
     margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.guest-banner svg {
+    display: inline-block;
+    vertical-align: middle;
 }
 
 @keyframes glow {
