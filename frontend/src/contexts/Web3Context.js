@@ -4,8 +4,10 @@ import { usePrivy, useWallets } from "@privy-io/react-auth";
 import { CONTRACTS } from "../contracts/config";
 import { useEns } from "../hooks/useEns";
 import { useTheme } from "./ThemeContext";
+import { useRoleSponsorship } from "../hooks/useRoleSponsorship";
 import RoleSelector from "../components/RoleSelector";
 import EnsRegistration from "../components/EnsRegistration";
+import FundingOptions from "../components/FundingOptions";
 import LoadingSpinner from "../components/LoadingSpinner";
 import axios from "axios";
 import { toast } from "react-hot-toast";
@@ -18,6 +20,7 @@ export const Web3Provider = ({ children }) => {
   const { wallets } = useWallets();
   const { lookupName, lookupProfile, shortenAddress, testEnsLookup, debugUserEns } = useEns();
   const { setInitialThemeForRole } = useTheme();
+  const { sponsorRoleRegistration, checkRelayerHealth } = useRoleSponsorship();
 
   const [provider, setProvider] = useState(null);
   const [signer, setSigner] = useState(null);
@@ -29,6 +32,7 @@ export const Web3Provider = ({ children }) => {
   const [role, setRole] = useState(null);
   const [showRoleSelector, setShowRoleSelector] = useState(false);
   const [showEnsRegistration, setShowEnsRegistration] = useState(false);
+  const [showFundingOptions, setShowFundingOptions] = useState(false);
   const [tempUserAddress, setTempUserAddress] = useState(null);
   const [ensName, setEnsName] = useState(null);
   const [ensAvatar, setEnsAvatar] = useState(null);
@@ -45,11 +49,55 @@ export const Web3Provider = ({ children }) => {
   const PINATA_SECRET =
     "32288745dd22dabdcc87653918e33841ccfcfbd45c43a89709f873aedcc7c9fe";
 
+  // Helper function to detect if user logged in via social method
+  const isSocialLoginUser = () => {
+    if (!user?.linkedAccounts) return false;
+    
+    const accounts = user.linkedAccounts;
+    const socialMethods = ['google_oauth', 'twitter_oauth', 'discord_oauth', 'github_oauth', 'email'];
+    
+    // A user is considered a social login user if any of their linked accounts
+    // are of a social type (even if Privy automatically creates an embedded wallet).
+    // This ensures that users who primarily logged in via social methods are prompted for funding.
+    return accounts.some(acc => socialMethods.includes(acc.type));
+  };
+
   // Helper function to get display name (ENS name or shortened address)
   const getDisplayName = () => {
-    if (user?.email?.address) return user.email.address;
-    if (ensName) return ensName;
-    if (address) return shortenAddress(address);
+    // 1. Prioritize Privy's direct email address (for email/password logins)
+    if (user?.email?.address) {
+      return user.email.address;
+    }
+
+    // 2. Prioritize email from a linked social account
+    const socialEmailAccount = user?.linkedAccounts?.find(
+      (acc) => 
+        (acc.type === 'google_oauth' || 
+         acc.type === 'twitter_oauth' || 
+         acc.type === 'discord_oauth' || 
+         acc.type === 'github_oauth') && acc.email
+    );
+    if (socialEmailAccount?.email) {
+      return socialEmailAccount.email;
+    }
+
+    // 3. If it's a social login (but no email found above), prioritize the shortened wallet address over ENS.
+    // This prevents displaying unrelated ENS names for embedded wallets associated with social logins.
+    if (isSocialLoginUser() && address) {
+      // The `isSocialLoginUser` check ensures this only applies if the primary login was social.
+      return shortenAddress(address);
+    }
+
+    // 4. Fallback to ENS name if available (for non-social users or social users without an email/wallet address).
+    if (ensName) {
+      return ensName;
+    }
+
+    // 5. Final fallback to shortened wallet address if no other name is found.
+    if (address) {
+      return shortenAddress(address);
+    }
+
     return "Unknown Artist";
   };
 
@@ -208,7 +256,9 @@ export const Web3Provider = ({ children }) => {
         // Check for existing role from blockchain
         try {
           const roleFromContract = await _event.roles(_address);
+          console.log("DEBUG: roleFromContract raw:", roleFromContract);
           const roleNumber = roleFromContract.toNumber ? roleFromContract.toNumber() : Number(roleFromContract);
+          console.log("DEBUG: roleNumber:", roleNumber);
           
           let roleName = null;
           switch (roleNumber) {
@@ -216,6 +266,7 @@ export const Web3Provider = ({ children }) => {
             case 2: roleName = 'musician'; break;
             default: roleName = null; break;
           }
+          console.log("DEBUG: resolved roleName:", roleName);
           
           if (roleName) {
             setRole(roleName);
@@ -246,16 +297,30 @@ export const Web3Provider = ({ children }) => {
             } catch (err) {
               console.log("No ENS name found for user");
             }
-          } else {
-            // No role registered on blockchain
+          } else { // This is the problematic else block if role exists
+            console.log("DEBUG: No role found on contract, proceeding to role selection or funding.");
             setTempUserAddress(_address);
-            setShowRoleSelector(true);
+            
+            // Check if this is a social login user who needs funding
+            if (isSocialLoginUser()) {
+              console.log("🏦 Social login user detected, showing funding options first");
+              setShowFundingOptions(true);
+            } else {
+              console.log("💳 Wallet user detected, showing role selector directly");
+              setShowRoleSelector(true);
+            }
           }
         } catch (error) {
-          console.error("Failed to fetch role from contract:", error);
-          // If we can't read from contract, show role selector
+          console.error("Failed to fetch role from contract (likely network issue or contract not deployed correctly):", error);
+          // If we can't read from contract, assume no role and proceed to role selection/funding
           setTempUserAddress(_address);
-          setShowRoleSelector(true);
+          
+          if (isSocialLoginUser()) {
+            console.log("🏦 Social login user (contract error path), showing funding options first");
+            setShowFundingOptions(true);
+          } else {
+            setShowRoleSelector(true);
+          }
         }
       } catch (error) {
         console.error("Web3 initialization failed:", error);
@@ -300,6 +365,7 @@ export const Web3Provider = ({ children }) => {
       setGoldRequirement(0);
       setShowRoleSelector(false);
       setShowEnsRegistration(false);
+      setShowFundingOptions(false);
     } catch (error) {
       console.error("Logout failed:", error);
     }
@@ -346,29 +412,31 @@ export const Web3Provider = ({ children }) => {
 
   const getArtistName = async (artistAddress) => {
     if (!artistAddress) return "Unknown Artist";
+
+    // Scenario 1: The artist is the currently logged-in user.
+    // Use the comprehensive getDisplayName logic for the current user's address.
+    if (address && artistAddress.toLowerCase() === address.toLowerCase()) {
+      return getDisplayName(); // This function already handles Privy email/ENS/shortenAddress for the current user.
+    }
+
+    // Scenario 2: The artist is NOT the currently logged-in user.
+    // Attempt to resolve their ENS name via the API.
     try {
       console.log("🎵 Getting artist name (ENS or address) for:", artistAddress);
-      
-      // Try to get ENS name first from your API server
-      try {
-        const res = await fetch(`http://localhost:4000/api/ens-name/${artistAddress}`);
-        const data = await res.json();
-        
-        if (data && data.ensName) {
-          console.log("✅ Found ENS name from API:", data.ensName);
-          return data.ensName;
-        }
-      } catch (ensErr) {
-        console.log("❌ ENS API lookup failed:", ensErr);
+      const res = await fetch(`http://localhost:4000/api/ens-name/${artistAddress}`);
+      const data = await res.json();
+
+      if (data && data.ensName) {
+        console.log("✅ Found ENS name from API for external artist:", data.ensName);
+        return data.ensName;
       }
-      
-      console.log("❌ No ENS found, using shortened address");
-      // Fallback directly to shortened address - no artist profile lookup
-      return shortenAddress(artistAddress);
-    } catch (err) {
-      console.error("Failed to get artist name:", err);
-      return shortenAddress(artistAddress);
+    } catch (ensErr) {
+      console.log("❌ ENS API lookup failed for external artist:", ensErr);
     }
+
+    // Fallback: No ENS name found for this artistAddress (who is not the current user).
+    console.log("❌ No ENS found for external artist, using shortened address for:", artistAddress);
+    return shortenAddress(artistAddress);
   };
 
   const uploadArtistProfile = async (name, goldReq) => {
@@ -445,26 +513,47 @@ export const Web3Provider = ({ children }) => {
 
   // Helper function to complete role selection after ENS check/registration
   const completeRoleSelection = async (selectedRole) => {
-    if (!address || !eventContract) return;
+    if (!address || !signer) return;
     
     try {
       setIsLoading(true);
       setLoadingMessage(`Registering as ${selectedRole}...`);
       
-      let tx;
-      switch (selectedRole) {
-        case "fan":
-          tx = await eventContract.registerAsFan();
-          break;
-        case "musician":
-          tx = await eventContract.registerAsMusician();
-          break;
-
-        default:
-          throw new Error("Invalid role");
-      }
+      // Check if relay service is available
+      const relayHealth = await checkRelayerHealth();
+      console.log("🔍 Relay health:", relayHealth);
       
-      await tx.wait();
+      let result;
+      
+      if (relayHealth && relayHealth.status === 'ok') {
+        // Use sponsored registration
+        console.log("🎯 Using sponsored registration");
+        toast.loading("Signing registration request...", { duration: 2000 });
+        
+        result = await sponsorRoleRegistration(selectedRole, signer, address);
+        console.log("✅ Sponsored registration result:", result);
+        
+        toast.success("Gasless registration successful! 🎉");
+      } else {
+        // Fallback to regular transaction
+        console.log("⚠️ Relay unavailable, falling back to regular transaction");
+        toast("Relay unavailable, using regular transaction", { icon: "⚠️" });
+        
+        let tx;
+        switch (selectedRole) {
+          case "fan":
+            tx = await eventContract.registerAsFan();
+            break;
+          case "musician":
+            tx = await eventContract.registerAsMusician();
+            break;
+          default:
+            throw new Error("Invalid role");
+        }
+        
+        await tx.wait();
+        toast.success("Registration successful!");
+      }
 
       setRole(selectedRole);
       setInitialThemeForRole(selectedRole);
@@ -477,9 +566,10 @@ export const Web3Provider = ({ children }) => {
       };
       
       toast.success(`Welcome, ${roleDisplayNames[selectedRole]}!`);
+      
     } catch (err) {
       console.error("Registration failed:", err);
-      toast.error("Registration failed.");
+      toast.error(`Registration failed: ${err.message}`);
     } finally {
       setIsLoading(false);
       setLoadingMessage("");
@@ -526,6 +616,28 @@ export const Web3Provider = ({ children }) => {
     // Store the selected role for after ENS registration
     setPendingRole(selectedRole);
   };
+
+  if (showFundingOptions) {
+    const handleFundingComplete = () => {
+      // User has funded their wallet, proceed to role selection
+      setShowFundingOptions(false);
+      setShowRoleSelector(true);
+    };
+
+    const handleFundingSkip = () => {
+      // User skipped funding, proceed to role selection anyway
+      setShowFundingOptions(false);
+      setShowRoleSelector(true);
+    };
+
+    return (
+      <FundingOptions
+        address={address}
+        onFundingComplete={handleFundingComplete}
+        onSkip={handleFundingSkip}
+      />
+    );
+  }
 
   if (showEnsRegistration) {
     const handleEnsRegistrationComplete = async (newEnsName) => {

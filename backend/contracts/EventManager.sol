@@ -79,6 +79,33 @@ contract EventManager is Ownable, IEventManager {
         emit Registered(msg.sender, Role.Musician);
     }
 
+    // 🎯 Meta-transaction role registration (for gas sponsorship)
+    function registerAsFanMeta(address user, uint8 v, bytes32 r, bytes32 s) external {
+        // Verify signature
+        bytes32 messageHash = keccak256(abi.encodePacked("registerAsFan", user));
+        bytes32 ethSignedMessageHash = keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n32", messageHash));
+        address signer = ecrecover(ethSignedMessageHash, v, r, s);
+        
+        require(signer == user, "Invalid signature");
+        require(roles[user] == Role.None, "Already registered");
+        
+        roles[user] = Role.Fan;
+        emit Registered(user, Role.Fan);
+    }
+
+    function registerAsMusicianMeta(address user, uint8 v, bytes32 r, bytes32 s) external {
+        // Verify signature
+        bytes32 messageHash = keccak256(abi.encodePacked("registerAsMusician", user));
+        bytes32 ethSignedMessageHash = keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n32", messageHash));
+        address signer = ecrecover(ethSignedMessageHash, v, r, s);
+        
+        require(signer == user, "Invalid signature");
+        require(roles[user] == Role.None, "Already registered");
+        
+        roles[user] = Role.Musician;
+        emit Registered(user, Role.Musician);
+    }
+
 
 
     // 🛠 Create an Event
@@ -97,7 +124,7 @@ contract EventManager is Ownable, IEventManager {
         }
 
         uint256 loyaltyStart = block.timestamp;
-        uint256 publicStart = loyaltyStart + 7 days;
+        uint256 publicStart = loyaltyStart; // Changed to allow immediate public sales for testing
 
         uint256 eventId = nextEventId++;
         events[eventId] = EventData({

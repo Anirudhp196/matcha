@@ -30,7 +30,7 @@ export async function trackRefunds(eventId, provider) {
       const etherValue = ethers.utils.formatEther(refundAmount);
 
       console.log(`👤 Buyer: ${buyer}`);
-      console.log(`   💰 Refund owed: ${etherValue} CHZ`);
+      console.log(`   💰 Refund owed: ${etherValue} FLOW`);
       console.log(`   🔍 ${etherValue === "0.0" ? "✅ Refunded" : "❌ Not refunded"}\n`);
     }
 

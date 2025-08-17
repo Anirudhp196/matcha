@@ -168,7 +168,7 @@ const ManageTickets = () => {
                   <p className="location-name">📍 {details?.location || "Unknown Location"}</p>
                   <p className="date-name">🗓 {details?.date || "Date TBD"}</p>
                   <p className="price-section">
-                    💰 <span className="price-text">Original Price: {details?.price || "N/A"} CHZ</span>
+                    💰 <span className="price-text">Original Price: {details?.price || "N/A"} FLOW</span>
                   </p>
 
                   {!details?.cancelled && (
@@ -176,7 +176,7 @@ const ManageTickets = () => {
                       <div className="price-input-container">
                         <input
                           type="number"
-                          placeholder="Set Resale Price (CHZ)"
+                          placeholder="Set Resale Price (FLOW)"
                           value={prices[t.tokenId] || ""}
                           onChange={(e) =>
                             setPrices({ ...prices, [t.tokenId]: e.target.value })

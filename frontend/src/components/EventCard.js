@@ -55,7 +55,7 @@ const EventCard = ({ event, onBuy, showBuyButton = true, isGuestUser = false }) 
       })
     : "Date TBD";
 
-  const formattedPrice = price ? `${ethers.utils.formatEther(price)} CHZ` : "—";
+  const formattedPrice = price ? `${ethers.utils.formatEther(price)} FLOW` : "—";
   const sold = ticketsSold ? ticketsSold.toString() : "0";
   const supply = maxTickets ? maxTickets.toString() : "?";
   const soldOut = ticketsSold && maxTickets && ticketsSold.gte(maxTickets);

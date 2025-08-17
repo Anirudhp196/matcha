@@ -133,7 +133,7 @@ const MarketplacePage = () => {
             <p className="location-detail"><LocationIcon size={16} /> {eventDetails.location}</p>
             <p className="date-detail"><CalendarIcon size={16} /> {eventDetails.date}</p>
             <p className="ticket-detail"><TicketIcon size={16} /> {eventDetails.ticketsSold} / {eventDetails.maxTickets} tickets sold</p>
-            <p className="price-detail"><MoneyIcon size={16} /> {formatEther(eventDetails.price)} CHZ (original price)</p>
+            <p className="price-detail"><MoneyIcon size={16} /> {formatEther(eventDetails.price)} FLOW (original price)</p>
           </div>
         </div>
       )}
@@ -163,7 +163,7 @@ const MarketplacePage = () => {
                 <div className="ticket-info">
                   <h3 className="ticket-title">Ticket #{l.tokenId.toString()}</h3>
                   <div className="price-section marketplace-price">
-                    💰 <span className="price-text">{formatEther(l.price)} CHZ</span>
+                    💰 <span className="price-text">{formatEther(l.price)} FLOW</span>
                   </div>
                   <div className="seller-info">
                     👤 Seller: {shortenAddress(l.seller)}
