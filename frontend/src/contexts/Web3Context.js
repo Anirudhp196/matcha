@@ -419,7 +419,7 @@ export const Web3Provider = ({ children }) => {
         return ensName;
       }
     } catch (ensErr) {
-      console.log("❌ ENS API lookup failed for artist:", ensErr);
+      console.log("❌ NIGGAGAGAG ENS API lookup failed for artist:", ensErr);
     }
 
     // Fallback: No ENS name found via API, use shortened address.
