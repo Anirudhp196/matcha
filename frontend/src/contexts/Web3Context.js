@@ -110,7 +110,7 @@ export const Web3Provider = ({ children }) => {
       // Use your ENS API server for profile lookup
       const fetchEnsProfile = async () => {
         try {
-          const res = await fetch(`http://localhost:4000/api/ens-profile/${address}`);
+          const res = await fetch(`https://9781005f3657.ngrok-free.app/api/ens-profile/${address}`);
           const profile = await res.json();
           
           console.log("✅ Web3Context: ENS API profile result:", profile);
@@ -423,7 +423,7 @@ export const Web3Provider = ({ children }) => {
     // Attempt to resolve their ENS name via the API.
     try {
       console.log("🎵 Getting artist name (ENS or address) for:", artistAddress);
-      const res = await fetch(`http://localhost:4000/api/ens-name/${artistAddress}`);
+      const res = await fetch(`https://9781005f3657.ngrok-free.app/api/ens-name/${artistAddress}`);
       const data = await res.json();
 
       if (data && data.ensName) {
