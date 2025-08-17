@@ -90,7 +90,7 @@ export const Web3Provider = ({ children }) => {
 
     // 4. Fallback to ENS name if available (for non-social users or social users without an email/wallet address).
     if (ensName) {
-      return ensName;
+      return ensName; 
     }
 
     // 5. Final fallback to shortened wallet address if no other name is found.
@@ -160,42 +160,41 @@ export const Web3Provider = ({ children }) => {
         const currentNetwork = await ethersProvider.getNetwork();
         console.log("Current network:", currentNetwork);
 
-        // Check if we're on Flow EVM Testnet (chainId: 545)
-        if (currentNetwork.chainId !== 545) {
-          console.log("Wrong network, switching to Flow EVM Testnet...");
+        // Check if we're on Flow EVM Mainnet (chainId: 747)
+        if (currentNetwork.chainId !== 747) {
+          console.log("Wrong network, switching to Flow EVM Mainnet...");
           try {
             await ethereumProvider.request({
               method: "wallet_switchEthereumChain",
-              params: [{ chainId: "0x221" }], // 545 in hex
+              params: [{ chainId: "0x2ED" }], // 747 in hex
             });
           } catch (switchError) {
             console.error("Failed to switch network:", switchError);
-
             if (switchError.code === 4902) {
               try {
                 await ethereumProvider.request({
                   method: "wallet_addEthereumChain",
                   params: [
                     {
-                      chainId: "0x221", // 545
-                      chainName: "Flow EVM Testnet",
+                      chainId: "0x2ED", // 747
+                      chainName: "Flow EVM Mainnet",
                       nativeCurrency: {
                         name: "FLOW",
                         symbol: "FLOW",
                         decimals: 18,
                       },
-                      rpcUrls: ["https://testnet.evm.nodes.onflow.org"],
-                      blockExplorerUrls: ["https://testnet.evm.nodes.onflow.org"],
+                      rpcUrls: ["https://mainnet.evm.nodes.onflow.org"],
+                      blockExplorerUrls: ["https://mainnet.evm.nodes.onflow.org"],
                     },
                   ],
                 });
               } catch (addError) {
                 console.error("Failed to add network:", addError);
-                toast.error("Please manually switch to Flow EVM Testnet");
+                toast.error("Please manually switch to Flow EVM Mainnet");
                 return;
               }
             } else {
-              toast.error("Please switch to Flow EVM Testnet");
+              toast.error("Please switch to Flow EVM Mainnet");
               return;
             }
           }
