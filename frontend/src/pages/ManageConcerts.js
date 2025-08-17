@@ -4,7 +4,7 @@ import { useWeb3 } from "../contexts/Web3Context";
 import { useTheme } from "../contexts/ThemeContext";
 import { useEvents } from "../hooks/useEvents";
 import LoadingSpinner from "../components/LoadingSpinner";
-import { MatchaIcon, MusicPerformanceIcon, TicketIcon } from "../components/Icons";
+import { MatchaIcon, TicketIcon } from "../components/Icons";
 import "./ManageConcerts.css";
 import CreateConcertForm from "../components/CreateConcertForm";
 import ManageEventCard from "../components/ManageEventCard";
@@ -59,7 +59,7 @@ const ManageConcerts = () => {
   return (
     <div className={`manage-concerts-container theme-${theme}`}>
       <h1 className={`page-title ${isMatcha ? 'matcha' : 'performative'}`}>
-        {isMatcha ? <><MatchaIcon size={32} /> Manage Your Matches</> : <><MusicPerformanceIcon size={32} /> Manage Your Concerts</>}
+        <><MatchaIcon size={32} /> Manage Your Concerts</>
       </h1>
 
       <div className="form-section loyalty-section">
@@ -81,7 +81,7 @@ const ManageConcerts = () => {
 
       <div className="form-section">
         <h2 className="form-title">
-          {isMatcha ? <><MatchaIcon size={24} /> Create a New Match</> : <><MusicPerformanceIcon size={24} /> Create a New Concert</>}
+          <><MatchaIcon size={24} /> Create a New Concert</>
         </h2>
         <div className="form-wrapper">
           <CreateConcertForm onCreated={refetch} />

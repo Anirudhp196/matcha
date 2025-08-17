@@ -2,13 +2,13 @@ import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useWeb3 } from '../contexts/Web3Context';
 import WalletButton from './WalletButton';
-import { MusicPerformanceIcon } from './Icons';
+import { MatchaIcon } from './Icons';
 import './Navbar.css';
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
-  const { address, role, forceRoleSelection } = useWeb3();
+  const { address, role } = useWeb3();
 
   const isActive = (path) => {
     return location.pathname === path ? 'active' : '';
@@ -20,7 +20,7 @@ const Navbar = () => {
         {/* Logo/Brand */}
         <div className="brand">
           <Link to="/" className="brand-link">
-            <MusicPerformanceIcon size={24} />
+            <MatchaIcon size={24} />
             <span className="brand-text">Matcha</span>
           </Link>
         </div>
@@ -45,25 +45,6 @@ const Navbar = () => {
             </>
           )}
         </div>
-
-        {/* Debug Section - TEMPORARY */}
-        {address && (
-          <button 
-            onClick={forceRoleSelection}
-            style={{
-              background: '#ff6b35',
-              color: 'white',
-              border: 'none',
-              padding: '8px 12px',
-              borderRadius: '4px',
-              cursor: 'pointer',
-              marginRight: '10px',
-              fontSize: '12px'
-            }}
-          >
-            Change Role ({role || 'none'})
-          </button>
-        )}
 
         {/* Wallet Section */}
         <div className="wallet-section">

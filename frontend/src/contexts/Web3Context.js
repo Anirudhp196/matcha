@@ -549,12 +549,7 @@ export const Web3Provider = ({ children }) => {
     );
   }
 
-  // Function to force role selector (for testing/debugging)
-  const forceRoleSelection = () => {
-    setRole(null);
-    setShowRoleSelector(true);
-    setShowEnsRegistration(false);
-  };
+
 
   return (
     <Web3Context.Provider
@@ -582,8 +577,6 @@ export const Web3Provider = ({ children }) => {
         fetchArtistProfile,
         isConnecting,
         user, // Privy user info (email, etc.)
-
-        forceRoleSelection, // Allow manual role selection
       }}
     >
       {children}

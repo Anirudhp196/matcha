@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { useWeb3 } from '../contexts/Web3Context';
 import { useTheme } from '../contexts/ThemeContext';
 import WalletButton from './WalletButton';
-import { MatchaIcon, MusicPerformanceIcon } from './Icons';
+import { MatchaIcon } from './Icons';
 import './DualThemeNavbar.css';
 
 const DualThemeNavbar = () => {
@@ -30,7 +30,7 @@ const DualThemeNavbar = () => {
         {/* Logo Section */}
         <Link to="/" className="logo-container">
           <div className="logo-icon">
-            {isMatcha ? <MatchaIcon size={32} /> : <MusicPerformanceIcon size={32} />}
+            <MatchaIcon size={32} />
           </div>
           <h1 className="brand-title">
             Matcha
@@ -79,7 +79,7 @@ const DualThemeNavbar = () => {
               disabled={role !== 'fan' && role !== 'musician'}
               title={role === 'sportsTeam' ? 'Sports Teams can only access the Match-a side' : ''}
             >
-              <span><MusicPerformanceIcon size={16} /> Performative</span>
+              <span><MatchaIcon size={16} /> Matcha</span>
             </button>
           </div>
         </div>
