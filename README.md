@@ -5,6 +5,14 @@
 [![React](https://img.shields.io/badge/React-19.1.0-blue.svg)](https://reactjs.org/)
 [![Solidity](https://img.shields.io/badge/Solidity-0.8.20-green.svg)](https://soliditylang.org/)
 [![Flow](https://img.shields.io/badge/Flow-EVM%20BaseNet-purple.svg)](https://flow.com/)
+Flow smart contracts address:
+
+{
+  "TICKET_ADDRESS": "0x503a6BF8297B28d5844e8472105E5e0cB834D809",
+  "EVENT_MANAGER_ADDRESS": "0x680429B3527B344A6C90F990F2a96212Dbd48E1d",
+  "MARKETPLACE_ADDRESS": "0x112Ea6E41Aa03096Ea949D3b62b8c6c3e26f26EC"
+}
+
 [![ENS](https://img.shields.io/badge/ENS-Integration-blue.svg)](https://ens.domains/)
 [![Privy](https://img.shields.io/badge/Privy-Auth%20v2-yellow.svg)](https://privy.io/)
 [![Hardhat](https://img.shields.io/badge/Hardhat-Development-orange.svg)](https://hardhat.org/)
