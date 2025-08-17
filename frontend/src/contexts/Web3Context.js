@@ -413,34 +413,22 @@ export const Web3Provider = ({ children }) => {
   const getArtistName = async (artistAddress) => {
     if (!artistAddress) return "Unknown Artist";
 
-    console.log("DEBUG: getArtistName called for:", artistAddress);
-    console.log("DEBUG: Current user address:", address);
-
-    // Scenario 1: The artist is the currently logged-in user.
-    // Use the comprehensive getDisplayName logic for the current user's address.
-    if (address && artistAddress.toLowerCase() === address.toLowerCase()) {
-      const displayName = getDisplayName();
-      console.log("DEBUG: Artist is current user. Display name:", displayName);
-      return displayName;
-    }
-
-    // Scenario 2: The artist is NOT the currently logged-in user.
-    // Attempt to resolve their ENS name via the API.
+    // Attempt to resolve ENS name via the API for ANY artistAddress.
     try {
-      console.log("DEBUG: Attempting ENS lookup for external artist:", artistAddress);
+      console.log("DEBUG: Attempting ENS lookup for artist:", artistAddress);
       const res = await fetch(`https://9781005f3657.ngrok-free.app/api/ens-name/${artistAddress}`);
       const data = await res.json();
 
       if (data && data.ensName) {
-        console.log("✅ Found ENS name from API for external artist:", data.ensName);
+        console.log("✅ Found ENS name from API for artist:", data.ensName);
         return data.ensName;
       }
     } catch (ensErr) {
-      console.log("❌ ENS API lookup failed for external artist:", ensErr);
+      console.log("❌ ENS API lookup failed for artist:", ensErr);
     }
 
-    // Fallback: No ENS name found for this artistAddress (who is not the current user).
-    console.log("❌ No ENS found for external artist, using shortened address for:", artistAddress);
+    // Fallback: No ENS name found via API, use shortened address.
+    console.log("❌ No ENS found for artist, using shortened address for:", artistAddress);
     return shortenAddress(artistAddress);
   };
 
