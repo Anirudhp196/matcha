@@ -272,6 +272,12 @@ export const Web3Provider = ({ children }) => {
             setRole(roleName);
             // Set initial theme based on blockchain role
             setInitialThemeForRole(roleName);
+            
+            // Ensure role selection/funding UI is hidden if a role is found
+            setShowRoleSelector(false);
+            setShowEnsRegistration(false);
+            setShowFundingOptions(false);
+            
             if (roleName === "musician") {
               try {
                 setLoadingMessage("Loading artist profile...");
