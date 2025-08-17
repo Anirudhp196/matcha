@@ -35,37 +35,14 @@ const EventCard = ({ event, onBuy, showBuyButton = true, isGuestUser = false }) 
     ? metadata.image.replace("ipfs://", "https://ipfs.io/ipfs/")
     : metadata?.image || (isMatcha ? "https://via.placeholder.com/400x200.png?text=Sports+Match" : "https://via.placeholder.com/400x200.png?text=Concert");
 
-  // Get artist name from metadata
+  // Get artist name from organizer address (ENS or shortened address only)
   useEffect(() => {
-    // First try to get from metadata
-    const artistAttr = metadata?.attributes?.find(attr => attr.trait_type === "Artist Name");
-    console.log("Artist Name from metadata:", artistAttr);
-    if (artistAttr && artistAttr.value) {
-      setArtistName(artistAttr.value);
-      return;
-    }
-    
-    // Fallback to the old method
-    const oldArtistAttr = metadata?.attributes?.find(attr => attr.trait_type === "Artist");
-    if (oldArtistAttr && oldArtistAttr.value) {
-      // If it's an address, try to fetch the real name
-      if (oldArtistAttr.value.startsWith("0x")) {
-        getArtistName(oldArtistAttr.value).then(name => {
-          if (name) setArtistName(name);
-        });
-      } else {
-        setArtistName(oldArtistAttr.value);
-      }
-      return;
-    }
-    
-    // If still not found, try to get it from the organizer address
     if (organizer) {
       getArtistName(organizer).then(name => {
         if (name) setArtistName(name);
       });
     }
-  }, [metadata, organizer, getArtistName]);
+  }, [organizer, getArtistName]);
 
   const formattedDate = eventDate
     ? new Date(Number(eventDate) * 1000).toLocaleString(undefined, {

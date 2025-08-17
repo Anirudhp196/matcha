@@ -71,8 +71,7 @@ const CreateConcertForm = ({ onCreated }) => {
       attributes: [
         { trait_type: "Event Date", value: form.date },
         { trait_type: "Location", value: form.location },
-        { trait_type: "Artist Address", value: address },
-        { trait_type: "Artist Name", value: getDisplayName() }
+        { trait_type: "Artist Address", value: address }
       ],
     };
 

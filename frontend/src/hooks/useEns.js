@@ -165,12 +165,21 @@ export const useEns = () => {
     setError(null);
 
     try {
+      console.log(`🔍 Checking availability for: ${cleanName}.eth`);
       const address = await provider.resolveName(`${cleanName}.eth`);
-      // If address is null, the name is available
-      return address === null;
+      console.log(`📍 Resolution result:`, address);
+      
+      // If address exists, the name is TAKEN (not available)
+      // If address is null, the name is AVAILABLE
+      const isAvailable = address === null;
+      console.log(`✅ ${cleanName}.eth is ${isAvailable ? 'AVAILABLE' : 'TAKEN'}`);
+      return isAvailable;
     } catch (err) {
-      // If resolution fails, assume it's available
-      return true;
+      console.log(`❌ ENS resolution error for ${cleanName}.eth:`, err.message);
+      // If there's a network error, we can't determine availability
+      // It's safer to return false (assume taken) to avoid false positives
+      console.log(`⚠️ Assuming ${cleanName}.eth is taken due to resolution error`);
+      return false;
     } finally {
       setLoading(false);
     }

@@ -345,9 +345,9 @@ export const Web3Provider = ({ children }) => {
   };
 
   const getArtistName = async (artistAddress) => {
-    if (!artistAddress || !eventContract) return "Unknown Artist";
+    if (!artistAddress) return "Unknown Artist";
     try {
-      console.log("🎵 Getting artist name from ENS API for:", artistAddress);
+      console.log("🎵 Getting artist name (ENS or address) for:", artistAddress);
       
       // Try to get ENS name first from your API server
       try {
@@ -362,10 +362,9 @@ export const Web3Provider = ({ children }) => {
         console.log("❌ ENS API lookup failed:", ensErr);
       }
       
-      console.log("❌ No ENS found, trying artist profile...");
-      // Fallback to artist profile
-      const profile = await fetchArtistProfile(artistAddress, eventContract);
-      return profile?.name || shortenAddress(artistAddress);
+      console.log("❌ No ENS found, using shortened address");
+      // Fallback directly to shortened address - no artist profile lookup
+      return shortenAddress(artistAddress);
     } catch (err) {
       console.error("Failed to get artist name:", err);
       return shortenAddress(artistAddress);
@@ -489,14 +488,38 @@ export const Web3Provider = ({ children }) => {
 
   // Helper function to check ENS and potentially show registration
   const handleRoleSelectionWithEnsCheck = async (selectedRole) => {
-    // First check if user already has an ENS name
+    console.log("🔍 Checking ENS before role selection...");
+    console.log("📍 Current ensName state:", ensName);
+    console.log("📍 Current address:", address);
+    
+    // First check if user already has an ENS name in state
     if (ensName) {
-      // User already has ENS, proceed directly to role registration
+      console.log("✅ User already has ENS name in state:", ensName);
       await completeRoleSelection(selectedRole);
       return;
     }
 
-    // No ENS name, offer to register one
+    // Double-check by doing a fresh ENS lookup
+    if (address) {
+      try {
+        console.log("🔄 Performing fresh ENS lookup for address:", address);
+        const freshEnsName = await lookupName(address);
+        
+        if (freshEnsName) {
+          console.log("✅ Found fresh ENS name:", freshEnsName);
+          setEnsName(freshEnsName); // Update state
+          await completeRoleSelection(selectedRole);
+          return;
+        } else {
+          console.log("❌ No ENS name found for address");
+        }
+      } catch (err) {
+        console.log("❌ ENS lookup failed:", err);
+      }
+    }
+
+    console.log("📝 No ENS name found, showing registration page");
+    // No ENS name found, offer to register one
     setShowRoleSelector(false);
     setShowEnsRegistration(true);
     

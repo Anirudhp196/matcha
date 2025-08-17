@@ -74,7 +74,7 @@ const EnsRegistration = ({ address, signer, onRegistrationComplete, onSkip }) =>
     const cleanName = desiredName.toLowerCase().replace(/\.eth$/, "");
     const ensUrl = `https://app.ens.domains/register/${cleanName}`;
     
-    toast.info("Opening ENS app in new tab...");
+    toast.loading("Opening ENS app in new tab...", { duration: 2000 });
     window.open(ensUrl, '_blank', 'noopener,noreferrer');
     
     // Show completion message and allow user to continue
