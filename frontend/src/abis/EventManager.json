@@ -1,5 +1,5 @@
 {
-  "address": "0x3ccA42c697c12Bf9698cD353a40Cd047F8B51761",
+  "address": "0x21f93d8B0794eF7e574d2c1a5cE9c073AC16EDD5",
   "abi": [
     {
       "inputs": [
@@ -322,11 +322,6 @@
           "internalType": "uint256",
           "name": "goldRequirement",
           "type": "uint256"
-        },
-        {
-          "internalType": "enum IEventManager.EventType",
-          "name": "eventType",
-          "type": "uint8"
         }
       ],
       "name": "createEvent",
@@ -422,11 +417,6 @@
           "internalType": "uint256",
           "name": "goldRequirement",
           "type": "uint256"
-        },
-        {
-          "internalType": "enum IEventManager.EventType",
-          "name": "eventType",
-          "type": "uint8"
         }
       ],
       "stateMutability": "view",
@@ -535,13 +525,6 @@
     {
       "inputs": [],
       "name": "registerAsMusician",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "registerAsSportsTeam",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"

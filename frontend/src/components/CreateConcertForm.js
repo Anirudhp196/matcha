@@ -110,11 +110,8 @@ const CreateConcertForm = ({ onCreated }) => {
     
     if (!eventContract || !address) return toast.error("Connect your wallet first!");
     
-    // Role-based validation
-    if (isMatcha && role !== 'sportsTeam') {
-      return toast.error("Only sports teams can create matches!");
-    }
-    if (!isMatcha && role !== 'musician') {
+    // Role-based validation - only musicians can create events
+    if (role !== 'musician') {
       return toast.error("Only musicians can create concerts!");
     }
     
@@ -126,7 +123,7 @@ const CreateConcertForm = ({ onCreated }) => {
     const eventDate = new Date(form.date);
     const currentDate = new Date();
     if (eventDate <= currentDate) {
-      return toast.error(isMatcha ? "Game date must be in the future!" : "Concert date must be in the future!");
+      return toast.error("Concert date must be in the future!");
     }
 
     try {
@@ -141,21 +138,18 @@ const CreateConcertForm = ({ onCreated }) => {
       const currentGoldRequirement = goldRequirement;
       
       setUploadProgress({
-        stage: isMatcha ? "Creating your game on the blockchain" : "Creating your concert on the blockchain",
+        stage: "Creating your concert on the blockchain",
         percent: 100,
         isUploading: true
       });
       
-      // Determine event type based on user role and theme
-      const eventType = (role === 'sportsTeam' || isMatcha) ? 1 : 0; // 1 = Sports, 0 = Performance
-
+      // Create concert event
       const tx = await eventContract.createEvent(
         metadataURI,
         ethers.utils.parseEther(form.price.toString()),
         parseInt(form.totalSupply),
         eventDateTimestamp,
-        currentGoldRequirement,
-        eventType
+        currentGoldRequirement
       );
       
       setUploadProgress({
@@ -185,8 +179,8 @@ const CreateConcertForm = ({ onCreated }) => {
 
   const isFormValid = form.name && form.description && form.price && form.totalSupply && form.date && form.location && image;
   
-  // Check if user has permission to create events on this side
-  const canCreateEvents = isMatcha ? role === 'sportsTeam' : role === 'musician';
+  // Check if user has permission to create events - only musicians can create concerts
+  const canCreateEvents = role === 'musician';
 
   if (!canCreateEvents) {
     return (
@@ -200,10 +194,7 @@ const CreateConcertForm = ({ onCreated }) => {
       }}>
         <h2 style={{color: '#ff6b6b', marginBottom: '1rem'}}>Access Restricted</h2>
         <p style={{marginBottom: '0.5rem'}}>
-          {isMatcha 
-            ? "Only Sports Teams can create matches on the Match-a side." 
-            : "Only Musicians can create concerts on the Performative side."
-          }
+          Only Musicians can create concerts.
         </p>
         <p>Your current role: <strong>{role || 'None'}</strong></p>
       </div>
@@ -284,7 +275,7 @@ const CreateConcertForm = ({ onCreated }) => {
         
         <div className="form-row">
           <div className="form-group">
-            <label htmlFor="price">Ticket Price (CHZ)</label>
+            <label htmlFor="price">Ticket Price (FLOW)</label>
             <input 
               id="price" 
               type="number" 

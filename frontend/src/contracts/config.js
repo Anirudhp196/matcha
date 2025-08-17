@@ -18,24 +18,24 @@ export const CONTRACTS = {
   }
 };
 
-// Network configuration for Privy
+// Network configuration for Privy (Flow EVM Testnet)
 export const NETWORK_CONFIG = {
-  id: 88882,
-  name: "Chiliz Spicy Testnet",
+  id: 545,
+  name: "Flow EVM Testnet",
   nativeCurrency: { 
-    name: "CHZ", 
-    symbol: "CHZ", 
+    name: "FLOW", 
+    symbol: "FLOW", 
     decimals: 18 
   },
   rpcUrls: {
     default: {
-      http: ["https://spicy-rpc.chiliz.com"]
+      http: ["https://testnet.evm.nodes.onflow.org"]
     }
   },
   blockExplorers: {
     default: {
-      name: "ChilizScan",
-      url: "https://testnet.chiliscan.com"
+      name: "Flow EVM Testnet Explorer",
+      url: "https://testnet.evm.nodes.onflow.org"
     }
   }
 };

@@ -2,7 +2,7 @@ import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { Web3Provider } from "./contexts/Web3Context";
 import { ThemeProvider } from "./contexts/ThemeContext";
-import DualThemeNavbar from "./components/DualThemeNavbar";
+import Navbar from "./components/Navbar";
 import RoleProtectedRoute from "./components/RoleProtectedRoute";
 import BrowseEvents from "./pages/BrowseEvents";
 import ManageConcerts from "./pages/ManageConcerts";
@@ -46,7 +46,7 @@ function App() {
           <div className="App">
             <Toaster position="top-right" />
             <Router>
-              <DualThemeNavbar />
+              <Navbar />
               <RoleProtectedRoute>
                 <Routes>
                   <Route path="/" element={<BrowseEvents />} />

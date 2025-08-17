@@ -28,7 +28,7 @@ export const useTickets = () => {
               tokenId: i, 
               uri,
               eventId: eventId.toNumber(),
-              eventType: eventData.eventType, // 0 = Performance, 1 = Sports
+              // All events are now concert/performance events
               eventData
             });
           }

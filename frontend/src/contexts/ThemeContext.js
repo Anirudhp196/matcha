@@ -23,12 +23,8 @@ export const ThemeProvider = ({ children }) => {
 
   // Function to set initial theme based on role
   const setInitialThemeForRole = (role) => {
-    if (role === 'sportsTeam') {
-      setTheme('matcha'); // Sports teams must start on Match-a side
-    } else if (role === 'musician') {
-      setTheme('performative'); // Musicians must start on Performative side
-    }
-    // Fans can start on either side (default performative)
+    // Everyone starts on performative side (concerts only)
+    setTheme('performative');
   };
 
   // Apply theme to body element

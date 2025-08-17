@@ -12,12 +12,14 @@ contract Ticket is ERC721URIStorage, Ownable, ITicket {
     // Mapping from tokenId to eventId
     mapping(uint256 => uint256) public tokenToEvent;
 
-    modifier onlyEventManager() {
+        modifier onlyEventManager() {
         require(msg.sender == eventManager, "Not authorized: not event manager");
         _;
     }
 
-    constructor(address _eventManager) ERC721("MoshTicket", "MTIX") Ownable(msg.sender) {
+    constructor(address _eventManager) 
+        ERC721("MoshTicket", "MTIX") 
+        Ownable(msg.sender) {
         eventManager = _eventManager;
     }
 

@@ -73,7 +73,7 @@ export const useEvents = () => {
             organizer: e.organizer,
             cancelled: e.cancelled,
             goldRequirement: e.goldRequirement.toNumber(),
-            eventType: e.eventType, // 0 = Performance, 1 = Sports
+            // All events are now concert/performance events
             isGoldHolder,
             loyaltyProgress,
             attendedCount: address ? loyaltyResults[index * 2 + 1]?.toNumber() : 0

@@ -1,20 +1,49 @@
 const { ethers } = require("ethers");
 require("dotenv").config();
 
-// Default to mainnet for ENS resolution, can be parameterized if needed
-// Use Infura if key is provided, otherwise use a public endpoint for testing
-const rpcUrl = process.env.INFURA_KEY 
-  ? `https://mainnet.infura.io/v3/${process.env.INFURA_KEY}`
-  : "https://rpc.ankr.com/eth"; // Public RPC endpoint
+// Use reliable RPC endpoints that support ENS
+// Try multiple endpoints in order of preference (PublicNode first - best ENS support)
+const rpcEndpoints = [
+  "https://ethereum.publicnode.com", // Public Node - excellent ENS support ✅
+  "https://rpc.ankr.com/eth", // Ankr - good backup
+  "https://cloudflare-eth.com", // Cloudflare - fallback (limited ENS support)
+  "https://eth.llamarpc.com" // LlamaRPC - last resort
+];
 
-// Handle both ethers v5 and v6 syntax
+// Handle both ethers v5 and v6 syntax with multiple endpoint fallback
 let provider;
-try {
-  // Try ethers v6 syntax first
-  provider = new ethers.JsonRpcProvider(rpcUrl);
-} catch (error) {
-  // Fallback to ethers v5 syntax
-  provider = new ethers.providers.JsonRpcProvider(rpcUrl);
+let activeRpcUrl = null;
+
+async function initializeProvider() {
+  if (provider) return provider; // Already initialized
+  
+  for (const rpcUrl of rpcEndpoints) {
+    try {
+      console.log(`Trying RPC endpoint: ${rpcUrl}`);
+      
+      // Try ethers v6 syntax first
+      let testProvider;
+      try {
+        testProvider = new ethers.JsonRpcProvider(rpcUrl);
+      } catch (error) {
+        // Fallback to ethers v5 syntax
+        testProvider = new ethers.providers.JsonRpcProvider(rpcUrl);
+      }
+      
+      // Test the provider with a simple call
+      await testProvider.getNetwork();
+      provider = testProvider;
+      activeRpcUrl = rpcUrl;
+      console.log(`✅ Successfully connected to: ${rpcUrl}`);
+      return provider;
+    } catch (error) {
+      console.log(`❌ Failed to connect to ${rpcUrl}:`, error.message);
+      continue;
+    }
+  }
+  
+  console.error("❌ Failed to connect to any RPC endpoint");
+  throw new Error("No working RPC endpoint found");
 }
 
 /**
@@ -24,15 +53,27 @@ try {
  */
 async function getENSName(address) {
   try {
+    await initializeProvider();
+    console.log(`🔍 Looking up ENS name for: ${address} using ${activeRpcUrl}`);
+    
     const name = await provider.lookupAddress(address);
+    console.log(`📛 Reverse lookup result: ${name || 'No ENS name'}`);
+    
     if (!name) return null;
+    
+    // Verify the name resolves back to the address
     const resolved = await provider.resolveName(name);
+    console.log(`🔄 Forward lookup verification: ${resolved}`);
+    
     if (resolved && resolved.toLowerCase() === address.toLowerCase()) {
+      console.log(`✅ ENS verification successful: ${name}`);
       return name;
+    } else {
+      console.log(`❌ ENS verification failed: ${name} resolves to ${resolved}, expected ${address}`);
+      return null;
     }
-    return null;
   } catch (err) {
-    console.error("ENS resolution error:", err);
+    console.error("❌ ENS resolution error:", err.message);
     return null;
   }
 }
@@ -43,77 +84,85 @@ async function getENSName(address) {
  * @returns {Promise<object|null>} - The ENS profile object or null.
  */
 async function getENSProfile(address) {
-  const name = await getENSName(address);
-  if (!name) {
-    return { address, name: null, avatar: null, description: null, url: null, twitter: null, github: null };
-  }
-
-  const resolver = await provider.getResolver(name);
-  if (!resolver) {
-    return { address, name, avatar: null, description: null, url: null, twitter: null, github: null };
-  }
-
-  const [avatar, description, url, twitter, github] = await Promise.all([
-    resolver.getText("avatar"),
-    resolver.getText("description"),
-    resolver.getText("url"),
-    resolver.getText("com.twitter"),
-    resolver.getText("com.github"),
-  ]);
-
-  // Process avatar URL to handle IPFS and other formats
-  let processedAvatar = avatar;
-  if (avatar) {
-    if (avatar.startsWith('ipfs://')) {
-      processedAvatar = avatar.replace('ipfs://', 'https://ipfs.io/ipfs/');
-    } else if (avatar.startsWith('ipfs/')) {
-      processedAvatar = `https://ipfs.io/ipfs/${avatar.slice(5)}`;
+  try {
+    await initializeProvider();
+    console.log(`🔍 Looking up ENS profile for: ${address}`);
+    
+    const name = await getENSName(address);
+    if (!name) {
+      console.log(`❌ No ENS name found for ${address}`);
+      return {
+        address,
+        name: null,
+        avatar: null,
+        description: null,
+        url: null,
+        twitter: null,
+        github: null,
+      };
     }
-  }
 
-  return { address, name, avatar: processedAvatar, description, url, twitter, github };
-}
+    console.log(`🔧 Getting resolver for: ${name}`);
+    const resolver = await provider.getResolver(name);
+    if (!resolver) {
+      console.log(`❌ No resolver found for: ${name}`);
+      return {
+        address,
+        name,
+        avatar: null,
+        description: null,
+        url: null,
+        twitter: null,
+        github: null,
+      };
+    }
 
-/**
- * Checks if an ENS name is available for registration.
- * @param {string} name - The ENS name to check (without .eth).
- * @returns {Promise<boolean>} - True if available, false if not.
- */
-async function checkENSAvailability(name) {
-  try {
-    // Create registrar contract instance
-    const registrarContract = new ethers.Contract("0x283Af0B28c62C092C9727F1Ee09c02CA627EB7F5", [
-      "function available(string calldata name) external view returns (bool)"
-    ], provider);
+    console.log(`📊 Fetching profile data for: ${name}`);
+    const [avatar, description, url, twitter, github] = await Promise.all([
+      resolver.getText("avatar").catch(() => null),
+      resolver.getText("description").catch(() => null),
+      resolver.getText("url").catch(() => null),
+      resolver.getText("com.twitter").catch(() => null),
+      resolver.getText("com.github").catch(() => null),
+    ]);
+
+    // Process avatar URL to handle IPFS and other formats
+    let processedAvatar = avatar;
+    if (avatar) {
+      console.log(`🖼️ Processing avatar: ${avatar}`);
+      if (avatar.startsWith("ipfs://")) {
+        processedAvatar = avatar.replace("ipfs://", "https://ipfs.io/ipfs/");
+      } else if (avatar.startsWith("ipfs/")) {
+        processedAvatar = `https://ipfs.io/ipfs/${avatar.slice(5)}`;
+      }
+      console.log(`🖼️ Processed avatar: ${processedAvatar}`);
+    }
+
+    const profile = {
+      address,
+      name,
+      avatar: processedAvatar,
+      description,
+      url,
+      twitter,
+      github,
+    };
+
+    console.log(`✅ ENS profile complete:`, profile);
+    return profile;
     
-    const available = await registrarContract.available(name);
-    return available;
   } catch (err) {
-    console.error("ENS availability check error:", err);
-    return false;
+    console.error("❌ ENS profile lookup error:", err.message);
+    return {
+      address,
+      name: null,
+      avatar: null,
+      description: null,
+      url: null,
+      twitter: null,
+      github: null,
+    };
   }
 }
 
-/**
- * Gets the registration cost for an ENS name.
- * @param {string} name - The ENS name to check (without .eth).
- * @param {number} duration - Duration in years.
- * @returns {Promise<string|null>} - Cost in wei as string, or null if error.
- */
-async function getENSRegistrationCost(name, duration = 1) {
-  try {
-    // Create registrar contract instance
-    const registrarContract = new ethers.Contract("0x283Af0B28c62C092C9727F1Ee09c02CA627EB7F5", [
-      "function rentPrice(string calldata name, uint256 duration) external view returns (uint256)"
-    ], provider);
-    
-    const durationInSeconds = duration * 365 * 24 * 60 * 60;
-    const cost = await registrarContract.rentPrice(name, durationInSeconds);
-    return cost.toString();
-  } catch (err) {
-    console.error("ENS cost check error:", err);
-    return null;
-  }
-}
-
-module.exports = { getENSName, getENSProfile, checkENSAvailability, getENSRegistrationCost }; 
+module.exports = { getENSName, getENSProfile };

@@ -3,8 +3,18 @@ const fs = require("fs");
 const path = require("path");
 
 async function main() {
-  const [deployer] = await hre.ethers.getSigners();
+  const signers = await hre.ethers.getSigners();
   const ethers = hre.ethers;
+
+  if (signers.length === 0) {
+    throw new Error("No signers available. Make sure you have set the PRIVATE_KEY in your .env file.");
+  }
+
+  const [deployer] = signers;
+  
+  if (!deployer || !deployer.address) {
+    throw new Error("Deployer is not properly configured. Check your PRIVATE_KEY in the .env file.");
+  }
 
   console.log("Deploying Matcha contracts with:", deployer.address);
 

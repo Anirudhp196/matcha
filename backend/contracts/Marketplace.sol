@@ -25,7 +25,8 @@ contract Marketplace is ReentrancyGuard, Ownable {
     event TicketPurchased(uint256 indexed tokenId, address indexed buyer, uint256 price);
     event TicketDelisted(uint256 indexed tokenId);
 
-    constructor(address _eventManager, address _ticketNFT) Ownable(msg.sender) {
+        constructor(address _eventManager, address _ticketNFT) 
+        Ownable(msg.sender) {
         eventManager = IEventManager(_eventManager);
         ticketNFT = ITicket(_ticketNFT);
     }
@@ -67,8 +68,7 @@ contract Marketplace is ReentrancyGuard, Ownable {
             bool cancelled,
             , // loyaltyStartTimestamp
             , // publicStartTimestamp
-            , // goldRequirement
-            // eventType
+            // goldRequirement
         ) = eventManager.events(listing.eventId);
 
         require(!cancelled, "Event cancelled");

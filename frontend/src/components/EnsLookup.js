@@ -10,7 +10,7 @@ const EnsLookup = () => {
   const [ensName, setEnsName] = useState(null);
   const [profile, setProfile] = useState(null);
   
-  const { loading, error, lookupComplete, isEthAddress, shortenAddress, clearError } = useEns();
+  const { loading, error, lookupName, lookupProfile, isEthAddress, shortenAddress, clearError } = useEns();
 
   const lookup = async () => {
     // Clear previous results
@@ -24,9 +24,13 @@ const EnsLookup = () => {
     }
 
     try {
-      const result = await lookupComplete(addr);
-      setEnsName(result.ensName);
-      setProfile(result.profile);
+      const ensName = await lookupName(addr);
+      setEnsName(ensName);
+      
+      if (ensName) {
+        const profile = await lookupProfile(addr);
+        setProfile(profile);
+      }
     } catch (e) {
       // Error is handled by the hook
       console.error('ENS lookup failed:', e);

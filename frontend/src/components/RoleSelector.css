@@ -78,10 +78,7 @@
   text-shadow: 0 0 8px rgba(0, 255, 231, 0.7);
 }
 
-.sports-option h3 {
-  color: #9CAF88;
-  text-shadow: 0 0 8px rgba(156, 175, 136, 0.7);
-}
+
 
 .role-divider {
   width: 1px;
@@ -121,16 +118,7 @@
   box-shadow: 0 0 25px rgba(0, 255, 231, 0.8);
 }
 
-.sports-button {
-  background: linear-gradient(45deg, #9CAF88, #6B8E23);
-  color: white;
-  box-shadow: 0 0 15px rgba(156, 175, 136, 0.5);
-}
 
-.sports-button:hover {
-  transform: scale(1.05) translateY(-5px);
-  box-shadow: 0 0 25px rgba(156, 175, 136, 0.8);
-}
 
 .role-loading {
   display: flex;

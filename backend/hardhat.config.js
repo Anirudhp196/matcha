@@ -3,25 +3,33 @@ require("@nomiclabs/hardhat-ethers");
 require("dotenv").config();
 
 module.exports = {
-  solidity: "0.8.20",
+  solidity: {
+    version: "0.8.20",
+    settings: {
+      optimizer: {
+        enabled: true,
+        runs: 200,
+      },
+      viaIR: true,
+    },
+  },
   paths: {
     sources: "./contracts",
     artifacts: "./artifacts",
     cache: "./cache",
   },
   networks: {
-    // Chiliz Mainnet
-    chiliz: {
-      url: "https://rpc.chiliz.com",
-      chainId: 88888,
+    // Flow EVM Mainnet
+    flowMainnet: {
+      url: "https://mainnet.evm.nodes.onflow.org",
+      chainId: 747, // Flow EVM Mainnet chainId
       accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
     },
-    // Chiliz Testnet (Spicy) - Default for development
-    chilizTestnet: {
-      url: "https://spicy-rpc.chiliz.com",
-      chainId: 88882,
+    // Flow EVM Testnet
+    flowTestnet: {
+      url: "https://testnet.evm.nodes.onflow.org",
+      chainId: 545, // Flow EVM Testnet chainId
       accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
     },
   },
-  defaultNetwork: "chilizTestnet",
 };

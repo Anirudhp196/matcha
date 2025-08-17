@@ -9,14 +9,14 @@ import EnsRegistration from "../components/EnsRegistration";
 import LoadingSpinner from "../components/LoadingSpinner";
 import axios from "axios";
 import { toast } from "react-hot-toast";
-import GasSponsorship from "../utils/gasSponsorship";
+
 
 const Web3Context = createContext();
 
 export const Web3Provider = ({ children }) => {
   const { ready, authenticated, login, logout, user } = usePrivy();
   const { wallets } = useWallets();
-  const { lookupName, lookupProfile, shortenAddress } = useEns();
+  const { lookupName, lookupProfile, shortenAddress, testEnsLookup, debugUserEns } = useEns();
   const { setInitialThemeForRole } = useTheme();
 
   const [provider, setProvider] = useState(null);
@@ -37,9 +37,9 @@ export const Web3Provider = ({ children }) => {
   const [isConnecting, setIsConnecting] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState("");
+  const [pendingRole, setPendingRole] = useState(null);
   
-  // Gas sponsorship instance
-  const [gasSponsorship] = useState(() => new GasSponsorship());
+
 
   const PINATA_API_KEY = "3bf4164172fae7b68de3";
   const PINATA_SECRET =
@@ -53,23 +53,45 @@ export const Web3Provider = ({ children }) => {
     return "Unknown Artist";
   };
 
-  // Lookup ENS name and avatar when address changes
+  // Lookup ENS name and avatar when address changes (using API server)
   useEffect(() => {
+    console.log("🎯 Web3Context: Address changed, checking ENS:", address);
     if (address) {
-      lookupProfile(address)
-        .then(profile => {
-          setEnsName(profile.ensName);
-          setEnsAvatar(profile.avatar);
-        })
-        .catch(() => {
+      console.log("🔍 Web3Context: Starting ENS lookup via API for:", address);
+      
+      // Use your ENS API server for profile lookup
+      const fetchEnsProfile = async () => {
+        try {
+          const res = await fetch(`http://localhost:4000/api/ens-profile/${address}`);
+          const profile = await res.json();
+          
+          console.log("✅ Web3Context: ENS API profile result:", profile);
+          
+          if (profile && profile.name) {
+            setEnsName(profile.name);
+            setEnsAvatar(profile.avatar);
+            console.log("📝 Web3Context: Set ENS name:", profile.name);
+            console.log("🖼️ Web3Context: Set ENS avatar:", profile.avatar);
+          } else {
+            console.log("❌ Web3Context: No ENS profile found");
+            setEnsName(null);
+            setEnsAvatar(null);
+          }
+        } catch (err) {
+          console.log("❌ Web3Context: ENS API lookup error:", err);
+          console.log("🔧 Make sure to run: node scripts/ensApi.js");
           setEnsName(null);
           setEnsAvatar(null);
-        });
+        }
+      };
+      
+      fetchEnsProfile();
     } else {
+      console.log("🚫 Web3Context: No address, clearing ENS data");
       setEnsName(null);
       setEnsAvatar(null);
     }
-  }, [address, lookupProfile]);
+  }, [address]);
 
   // Initialize Web3 when user is authenticated and has wallet
   useEffect(() => {
@@ -89,6 +111,47 @@ export const Web3Provider = ({ children }) => {
         // Check current network
         const currentNetwork = await ethersProvider.getNetwork();
         console.log("Current network:", currentNetwork);
+
+        // Check if we're on Flow EVM Testnet (chainId: 545)
+        if (currentNetwork.chainId !== 545) {
+          console.log("Wrong network, switching to Flow EVM Testnet...");
+          try {
+            await ethereumProvider.request({
+              method: "wallet_switchEthereumChain",
+              params: [{ chainId: "0x221" }], // 545 in hex
+            });
+          } catch (switchError) {
+            console.error("Failed to switch network:", switchError);
+
+            if (switchError.code === 4902) {
+              try {
+                await ethereumProvider.request({
+                  method: "wallet_addEthereumChain",
+                  params: [
+                    {
+                      chainId: "0x221", // 545
+                      chainName: "Flow EVM Testnet",
+                      nativeCurrency: {
+                        name: "FLOW",
+                        symbol: "FLOW",
+                        decimals: 18,
+                      },
+                      rpcUrls: ["https://testnet.evm.nodes.onflow.org"],
+                      blockExplorerUrls: ["https://testnet.evm.nodes.onflow.org"],
+                    },
+                  ],
+                });
+              } catch (addError) {
+                console.error("Failed to add network:", addError);
+                toast.error("Please manually switch to Flow EVM Testnet");
+                return;
+              }
+            } else {
+              toast.error("Please switch to Flow EVM Testnet");
+              return;
+            }
+          }
+        }
 
         const ethersSigner = ethersProvider.getSigner();
         const _address = await ethersSigner.getAddress();
@@ -142,25 +205,55 @@ export const Web3Provider = ({ children }) => {
         setEventContract(_event);
         setMarketplaceContract(_marketplace);
 
-        // Check for existing role
-        const savedRole = localStorage.getItem(`mosh-role-${_address}`);
-        if (savedRole) {
-          setRole(savedRole);
-          // Set initial theme based on saved role
-          setInitialThemeForRole(savedRole);
-          if (savedRole === "musician") {
+        // Check for existing role from blockchain
+        try {
+          const roleFromContract = await _event.roles(_address);
+          const roleNumber = roleFromContract.toNumber ? roleFromContract.toNumber() : Number(roleFromContract);
+          
+          let roleName = null;
+          switch (roleNumber) {
+            case 1: roleName = 'fan'; break;
+            case 2: roleName = 'musician'; break;
+            default: roleName = null; break;
+          }
+          
+          if (roleName) {
+            setRole(roleName);
+            // Set initial theme based on blockchain role
+            setInitialThemeForRole(roleName);
+            if (roleName === "musician") {
+              try {
+                setLoadingMessage("Loading artist profile...");
+                const profile = await fetchArtistProfile(_address, _event);
+                if (profile && profile.goldRequirement !== undefined) {
+                  setGoldRequirement(profile.goldRequirement);
+                }
+              } catch (err) {
+                console.error("Failed to load artist profile:", err);
+              }
+            }
+            
+            // Look up ENS name and avatar for the connected user
             try {
-              setLoadingMessage("Loading artist profile...");
-              const profile = await fetchArtistProfile(_address, _event);
-              if (profile && profile.goldRequirement !== undefined) {
-                setGoldRequirement(profile.goldRequirement);
+              const ensName = await lookupName(_address);
+              if (ensName) {
+                setEnsName(ensName);
+                const profile = await lookupProfile(_address);
+                if (profile && profile.avatar) {
+                  setEnsAvatar(profile.avatar);
+                }
               }
             } catch (err) {
-              console.error("Failed to load artist profile:", err);
-              // No need to show artist form anymore - we use wallet/ENS name
+              console.log("No ENS name found for user");
             }
+          } else {
+            // No role registered on blockchain
+            setTempUserAddress(_address);
+            setShowRoleSelector(true);
           }
-        } else {
+        } catch (error) {
+          console.error("Failed to fetch role from contract:", error);
+          // If we can't read from contract, show role selector
           setTempUserAddress(_address);
           setShowRoleSelector(true);
         }
@@ -254,16 +347,28 @@ export const Web3Provider = ({ children }) => {
   const getArtistName = async (artistAddress) => {
     if (!artistAddress || !eventContract) return "Unknown Artist";
     try {
-
-      const res = await fetch(`http://localhost:4000/api/ens-name/0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045
-`);
-      const data = res.await();
-      if(data && data.name) return data.name;
+      console.log("🎵 Getting artist name from ENS API for:", artistAddress);
+      
+      // Try to get ENS name first from your API server
+      try {
+        const res = await fetch(`http://localhost:4000/api/ens-name/${artistAddress}`);
+        const data = await res.json();
+        
+        if (data && data.ensName) {
+          console.log("✅ Found ENS name from API:", data.ensName);
+          return data.ensName;
+        }
+      } catch (ensErr) {
+        console.log("❌ ENS API lookup failed:", ensErr);
+      }
+      
+      console.log("❌ No ENS found, trying artist profile...");
+      // Fallback to artist profile
       const profile = await fetchArtistProfile(artistAddress, eventContract);
-      return profile?.name || "Unknown Artist";
+      return profile?.name || shortenAddress(artistAddress);
     } catch (err) {
       console.error("Failed to get artist name:", err);
-      return "Unknown Artist";
+      return shortenAddress(artistAddress);
     }
   };
 
@@ -309,17 +414,7 @@ export const Web3Provider = ({ children }) => {
     }
   };
 
-  // Execute sponsored transaction
-  const executeSponsoredTransaction = async (contract, functionName, args = [], value = 0) => {
-    try {
-      console.log(`🎯 Attempting sponsored ${functionName} transaction`);
-      return await gasSponsorship.executeSponsoredTransaction(contract, functionName, args, value);
-    } catch (error) {
-      console.error('Sponsored transaction failed, falling back to regular transaction:', error);
-      toast.error('Gas sponsorship failed, please ensure you have CHZ for gas fees');
-      throw error;
-    }
-  };
+
 
 
 
@@ -360,14 +455,12 @@ export const Web3Provider = ({ children }) => {
       let tx;
       switch (selectedRole) {
         case "fan":
-          tx = await executeSponsoredTransaction(eventContract, 'registerAsFan');
+          tx = await eventContract.registerAsFan();
           break;
         case "musician":
-          tx = await executeSponsoredTransaction(eventContract, 'registerAsMusician');
+          tx = await eventContract.registerAsMusician();
           break;
-        case "sportsTeam":
-          tx = await executeSponsoredTransaction(eventContract, 'registerAsSportsTeam');
-          break;
+
         default:
           throw new Error("Invalid role");
       }
@@ -375,15 +468,13 @@ export const Web3Provider = ({ children }) => {
       await tx.wait();
 
       setRole(selectedRole);
-      localStorage.setItem(`mosh-role-${address}`, selectedRole);
       setInitialThemeForRole(selectedRole);
       setShowRoleSelector(false);
       setShowEnsRegistration(false);
       
       const roleDisplayNames = {
         fan: "fan",
-        musician: "musician",
-        sportsTeam: "sports team"
+        musician: "musician"
       };
       
       toast.success(`Welcome, ${roleDisplayNames[selectedRole]}!`);
@@ -410,7 +501,7 @@ export const Web3Provider = ({ children }) => {
     setShowEnsRegistration(true);
     
     // Store the selected role for after ENS registration
-    localStorage.setItem(`mosh-pending-role-${address}`, selectedRole);
+    setPendingRole(selectedRole);
   };
 
   if (showEnsRegistration) {
@@ -420,11 +511,9 @@ export const Web3Provider = ({ children }) => {
       setShowEnsRegistration(false);
       
       // Get the pending role and complete registration
-      const pendingRole = localStorage.getItem(`mosh-pending-role-${address}`);
-      localStorage.removeItem(`mosh-pending-role-${address}`);
-      
       if (pendingRole) {
         await completeRoleSelection(pendingRole);
+        setPendingRole(null);
       }
     };
 
@@ -433,11 +522,9 @@ export const Web3Provider = ({ children }) => {
       setShowEnsRegistration(false);
       
       // Get the pending role and complete registration
-      const pendingRole = localStorage.getItem(`mosh-pending-role-${address}`);
-      localStorage.removeItem(`mosh-pending-role-${address}`);
-      
       if (pendingRole) {
         await completeRoleSelection(pendingRole);
+        setPendingRole(null);
       }
     };
 
@@ -454,16 +541,20 @@ export const Web3Provider = ({ children }) => {
   if (showRoleSelector) {
     const handleSelectFan = () => handleRoleSelectionWithEnsCheck("fan");
     const handleSelectArtist = () => handleRoleSelectionWithEnsCheck("musician");
-    const handleSelectSportsTeam = () => handleRoleSelectionWithEnsCheck("sportsTeam");
-
     return (
       <RoleSelector
         onSelectFan={handleSelectFan}
         onSelectArtist={handleSelectArtist}
-        onSelectSportsTeam={handleSelectSportsTeam}
       />
     );
   }
+
+  // Function to force role selector (for testing/debugging)
+  const forceRoleSelection = () => {
+    setRole(null);
+    setShowRoleSelector(true);
+    setShowEnsRegistration(false);
+  };
 
   return (
     <Web3Context.Provider
@@ -485,12 +576,14 @@ export const Web3Provider = ({ children }) => {
         ensAvatar,
         goldRequirement,
         setGoldRequirement: updateGoldRequirement,
+        testEnsLookup, // Test function for debugging
+        debugUserEns, // Debug function for user's specific address
         getArtistName,
         fetchArtistProfile,
         isConnecting,
         user, // Privy user info (email, etc.)
-        executeSponsoredTransaction, // Custom gas sponsorship
-        gasSponsorship, // Gas sponsorship instance
+
+        forceRoleSelection, // Allow manual role selection
       }}
     >
       {children}

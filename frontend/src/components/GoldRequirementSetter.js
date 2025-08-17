@@ -12,11 +12,11 @@ const GoldRequirementSetter = () => {
   const [isUpdating, setIsUpdating] = useState(false);
 
   const isMatcha = theme === 'matcha';
-  const eventTypeText = isMatcha ? 'match' : 'concert';
-  const eventTypeTextPlural = isMatcha ? 'matches' : 'concerts';
+  const eventTypeText = 'concert';
+  const eventTypeTextPlural = 'concerts';
 
-  // Only show for event creators (musicians and sports teams)
-  if (role !== "musician" && role !== "sportsTeam") return null;
+  // Only show for event creators (musicians only)
+  if (role !== "musician") return null;
 
   const handleSubmit = async (e) => {
     e.preventDefault();

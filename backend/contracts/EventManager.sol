@@ -9,7 +9,7 @@ contract EventManager is Ownable, IEventManager {
     Ticket public ticketNFT;
     uint256 public nextEventId;
 
-    enum Role { None, Fan, Musician, SportsTeam }
+    enum Role { None, Fan, Musician }
     enum LoyaltyTier { None, Gold }
 
     mapping(address => Role) public roles;
@@ -28,7 +28,7 @@ contract EventManager is Ownable, IEventManager {
         uint256 loyaltyStartTimestamp; // When Gold fans can start buying
         uint256 publicStartTimestamp;  // When everyone can start buying
         uint256 goldRequirement;       // # of events needed to reach Gold loyalty
-        IEventManager.EventType eventType;           // Performance or Sports
+        // Event type removed - only performances supported
     }
 
     mapping(uint256 => EventData) public events;
@@ -59,9 +59,12 @@ contract EventManager is Ownable, IEventManager {
     event RefundIssued(address indexed buyer, uint256 amount);
     event Registered(address indexed user, Role role);
 
-    constructor(address _ticketNFT) Ownable(msg.sender) {
+    constructor(address _ticketNFT) 
+        Ownable(msg.sender) {
         ticketNFT = Ticket(_ticketNFT);
     }
+
+
 
     // 🚀 Role registration
     function registerAsFan() external {
@@ -76,11 +79,7 @@ contract EventManager is Ownable, IEventManager {
         emit Registered(msg.sender, Role.Musician);
     }
 
-    function registerAsSportsTeam() external {
-        if (roles[msg.sender] != Role.None) revert AlreadyRegistered();
-        roles[msg.sender] = Role.SportsTeam;
-        emit Registered(msg.sender, Role.SportsTeam);
-    }
+
 
     // 🛠 Create an Event
     function createEvent(
@@ -88,17 +87,12 @@ contract EventManager is Ownable, IEventManager {
         uint256 ticketPrice,
         uint256 maxTickets,
         uint256 eventDate,
-        uint256 goldRequirement,
-        IEventManager.EventType eventType
+        uint256 goldRequirement
     ) external override {
         if (eventDate <= block.timestamp) revert EventInPast();
         
-        // Role-based event type validation
-        Role organizerRole = roles[msg.sender];
-        if (eventType == IEventManager.EventType.Performance && organizerRole != Role.Musician) {
-            revert InvalidRoleForEventType();
-        }
-        if (eventType == IEventManager.EventType.Sports && organizerRole != Role.SportsTeam) {
+        // Only musicians can create events
+        if (roles[msg.sender] != Role.Musician) {
             revert InvalidRoleForEventType();
         }
 
@@ -117,8 +111,7 @@ contract EventManager is Ownable, IEventManager {
             cancelled: false,
             loyaltyStartTimestamp: loyaltyStart,
             publicStartTimestamp: publicStart,
-            goldRequirement: goldRequirement,
-            eventType: eventType
+            goldRequirement: goldRequirement
         });
 
         emit EventCreated(eventId, msg.sender);

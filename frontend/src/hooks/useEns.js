@@ -1,7 +1,5 @@
-import { useState, useCallback } from 'react';
-
-// Backend API base URL - you can set this in .env file if needed
-const API_BASE = process.env.REACT_APP_ENS_API_BASE || "http://localhost:4000";
+import { useState, useCallback, useMemo } from 'react';
+import { ethers } from 'ethers';
 
 const isEthAddress = (address) => /^0x[a-fA-F0-9]{40}$/.test(address?.trim() || '');
 
@@ -9,136 +7,157 @@ export const useEns = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  // Initialize provider for ENS operations (using Ethereum mainnet for ENS)
+  const provider = useMemo(() => {
+    try {
+      // Use a more reliable RPC endpoint
+      return new ethers.providers.JsonRpcProvider('https://cloudflare-eth.com');
+    } catch (err) {
+      console.error('Failed to initialize ENS provider:', err);
+      return null;
+    }
+  }, []);
+
   // Look up ENS name for an address
   const lookupName = useCallback(async (address) => {
+    console.log("🔍 ENS lookupName called with address:", address);
+    
     if (!isEthAddress(address)) {
+      console.log("❌ Invalid Ethereum address:", address);
       throw new Error("Invalid Ethereum address");
+    }
+
+    if (!provider) {
+      console.log("❌ ENS provider not available, skipping lookup");
+      return null;
     }
 
     setLoading(true);
     setError(null);
 
     try {
-      const response = await fetch(`${API_BASE}/api/ens-name/${address.trim()}`);
-      
-      if (!response.ok) {
-        throw new Error(`ENS name lookup failed: ${response.status}`);
-      }
-
-      const data = await response.json();
-      return data.ensName;
+      console.log("🌐 Looking up ENS name for address:", address);
+      const ensName = await provider.lookupAddress(address);
+      console.log("✅ ENS lookup result:", ensName || "No ENS name found");
+      return ensName;
     } catch (err) {
-      const errorMessage = err.message || "ENS name lookup failed";
-      setError(errorMessage);
-      throw new Error(errorMessage);
+      console.log("❌ ENS lookup failed (network issue), continuing without ENS:", err.message);
+      // Don't throw error, just return null to continue without ENS
+      return null;
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [provider]);
 
-  // Look up full ENS profile for an address
+  // Look up address for an ENS name
+  const lookupAddress = useCallback(async (ensName) => {
+    if (!ensName || !ensName.includes('.eth')) {
+      throw new Error("Invalid ENS name");
+    }
+
+    if (!provider) {
+      console.log("ENS provider not available, skipping address lookup");
+      return null;
+    }
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const address = await provider.resolveName(ensName);
+      return address;
+    } catch (err) {
+      console.log("ENS address lookup failed, continuing without ENS:", err.message);
+      return null;
+    } finally {
+      setLoading(false);
+    }
+  }, [provider]);
+
+  // Look up ENS profile (avatar, etc.) for an address
   const lookupProfile = useCallback(async (address) => {
+    console.log("🔍 ENS lookupProfile called with address:", address);
+    
     if (!isEthAddress(address)) {
+      console.log("❌ Invalid Ethereum address:", address);
       throw new Error("Invalid Ethereum address");
+    }
+
+    if (!provider) {
+      console.log("❌ ENS provider not available, skipping profile lookup");
+      return null;
     }
 
     setLoading(true);
     setError(null);
 
     try {
-      const response = await fetch(`${API_BASE}/api/ens-profile/${address.trim()}`);
+      console.log("🌐 Looking up ENS name for profile:", address);
+      const ensName = await provider.lookupAddress(address);
+      console.log("📛 ENS name found:", ensName || "No ENS name");
       
-      if (!response.ok) {
-        throw new Error(`ENS profile lookup failed: ${response.status}`);
+      if (!ensName) {
+        return null;
       }
 
-      const profileData = await response.json();
+      // Get resolver to fetch profile data
+      console.log("🔧 Getting resolver for:", ensName);
+      const resolver = await provider.getResolver(ensName);
+      if (!resolver) {
+        console.log("❌ No resolver found for:", ensName);
+        return { ensName };
+      }
+
+      // Fetch avatar and other profile data safely
+      const profileData = { ensName };
+      console.log("📊 Fetching profile data for:", ensName);
       
-      // Transform backend response to frontend format
-      return {
-        address: profileData.address,
-        ensName: profileData.name,
-        avatar: profileData.avatar,
-        records: {
-          url: profileData.url,
-          'com.twitter': profileData.twitter,
-          'com.github': profileData.github,
-          description: profileData.description,
-          email: null // Backend doesn't include email yet
-        }
-      };
+      try {
+        console.log("🖼️ Fetching avatar...");
+        profileData.avatar = await resolver.getAvatar();
+        console.log("✅ Avatar found:", profileData.avatar || "No avatar");
+      } catch (e) {
+        console.log("❌ Avatar fetch failed:", e.message);
+        profileData.avatar = null;
+      }
+      
+      try {
+        console.log("📝 Fetching description...");
+        profileData.description = await resolver.getText('description');
+        console.log("✅ Description found:", profileData.description || "No description");
+      } catch (e) {
+        console.log("❌ Description fetch failed:", e.message);
+        profileData.description = null;
+      }
+      
+      try {
+        console.log("🔗 Fetching URL...");
+        profileData.url = await resolver.getText('url');
+        console.log("✅ URL found:", profileData.url || "No URL");
+      } catch (e) {
+        console.log("❌ URL fetch failed:", e.message);
+        profileData.url = null;
+      }
+
+      console.log("🎯 Final profile data:", profileData);
+      return profileData;
     } catch (err) {
-      const errorMessage = err.message || "ENS profile lookup failed";
-      setError(errorMessage);
-      throw new Error(errorMessage);
+      console.log("❌ ENS profile lookup failed, continuing without ENS:", err.message);
+      return null;
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [provider]);
 
-  // Look up both name and profile in parallel
-  const lookupComplete = useCallback(async (address) => {
-    if (!isEthAddress(address)) {
-      throw new Error("Invalid Ethereum address");
+  // Check ENS name availability
+  const checkAvailability = useCallback(async (ensName) => {
+    if (!ensName) {
+      throw new Error("ENS name is required");
     }
 
-    setLoading(true);
-    setError(null);
-
-    try {
-      const [nameRes, profileRes] = await Promise.all([
-        fetch(`${API_BASE}/api/ens-name/${address.trim()}`),
-        fetch(`${API_BASE}/api/ens-profile/${address.trim()}`)
-      ]);
-
-      if (!nameRes.ok) {
-        throw new Error(`ENS name lookup failed: ${nameRes.status}`);
-      }
-      if (!profileRes.ok) {
-        throw new Error(`ENS profile lookup failed: ${profileRes.status}`);
-      }
-
-      const nameData = await nameRes.json();
-      const profileData = await profileRes.json();
-
-      return {
-        ensName: nameData.ensName,
-        profile: {
-          address: profileData.address,
-          ensName: profileData.name,
-          avatar: profileData.avatar,
-          records: {
-            url: profileData.url,
-            'com.twitter': profileData.twitter,
-            'com.github': profileData.github,
-            description: profileData.description,
-            email: null
-          }
-        }
-      };
-    } catch (err) {
-      const errorMessage = err.message || "ENS lookup failed";
-      setError(errorMessage);
-      throw new Error(errorMessage);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  // Utility function to shorten Ethereum addresses
-  const shortenAddress = useCallback((address) => {
-    if (!address || typeof address !== 'string') return '';
-    return address.slice(0, 6) + "..." + address.slice(-4);
-  }, []);
-
-  // Clear error state
-  const clearError = useCallback(() => {
-    setError(null);
-  }, []);
-
-  // Check if an ENS name is available for registration
-  const checkAvailability = useCallback(async (name) => {
-    if (!name || name.length < 3) {
+    const cleanName = ensName.toLowerCase().replace(/\.eth$/, '');
+    
+    if (cleanName.length < 3) {
       throw new Error("Name must be at least 3 characters long");
     }
 
@@ -146,63 +165,178 @@ export const useEns = () => {
     setError(null);
 
     try {
-      const cleanName = name.toLowerCase().replace(/\.eth$/, "");
-      const response = await fetch(`${API_BASE}/api/ens-available/${cleanName}`);
-      
-      if (!response.ok) {
-        throw new Error(`ENS availability check failed: ${response.status}`);
-      }
-
-      const data = await response.json();
-      return data.available;
+      const address = await provider.resolveName(`${cleanName}.eth`);
+      // If address is null, the name is available
+      return address === null;
     } catch (err) {
-      const errorMessage = err.message || "ENS availability check failed";
-      setError(errorMessage);
-      throw new Error(errorMessage);
+      // If resolution fails, assume it's available
+      return true;
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [provider]);
 
-  // Get registration cost for an ENS name
-  const getRegistrationCost = useCallback(async (name, duration = 1) => {
-    if (!name || name.length < 3) {
-      throw new Error("Invalid name");
+  // Get registration cost estimate
+  const getRegistrationCost = useCallback(async (ensName, years = 1) => {
+    if (!ensName) {
+      throw new Error("ENS name is required");
     }
 
-    setLoading(true);
+    const cleanName = ensName.toLowerCase().replace(/\.eth$/, '');
+
+    // Estimated pricing based on ENS app pricing
+    let basePrice;
+    if (cleanName.length >= 5) {
+      basePrice = "0.005"; // ~$5/year for 5+ character names
+    } else if (cleanName.length === 4) {
+      basePrice = "0.02"; // ~$20/year for 4 character names
+    } else {
+      basePrice = "0.05"; // ~$50/year for 3 character names
+    }
+    
+    const totalPrice = (parseFloat(basePrice) * years).toString();
+    return ethers.utils.parseEther(totalPrice);
+  }, []);
+
+  // Register ENS name by redirecting to official ENS app
+  const registerName = useCallback(async (ensName, signer, years = 1) => {
+    if (!ensName) {
+      throw new Error("ENS name is required");
+    }
+
+    const cleanName = ensName.toLowerCase().replace(/\.eth$/, '');
+
+    // Open the official ENS app for registration
+    const ensUrl = `https://app.ens.domains/register/${cleanName}`;
+    window.open(ensUrl, '_blank', 'noopener,noreferrer');
+    
+    // Return a mock transaction for compatibility with existing UI
+    return {
+      hash: 'redirect_to_ens_app',
+      wait: async () => ({ 
+        status: 1,
+        transactionHash: 'redirect_to_ens_app'
+      })
+    };
+  }, []);
+
+  // Utility function to shorten address
+  const shortenAddress = useCallback((address) => {
+    if (!isEthAddress(address)) return address;
+    return `${address.slice(0, 6)}...${address.slice(-4)}`;
+  }, []);
+
+  // Clear error state
+  const clearError = useCallback(() => {
     setError(null);
+  }, []);
+
+  // Test function to verify ENS is working with known address
+  const testEnsLookup = useCallback(async () => {
+    const testAddress = "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045"; // vitalik.eth
+    console.log("🧪 Testing ENS lookup with vitalik.eth address:", testAddress);
+    try {
+      const profile = await lookupProfile(testAddress);
+      console.log("🧪 Test result:", profile);
+      return profile;
+    } catch (err) {
+      console.log("🧪 Test failed:", err);
+      return null;
+    }
+  }, [lookupProfile]);
+
+  // Test function specifically for user's address with detailed debugging
+  const debugUserEns = useCallback(async (userAddress) => {
+    console.log("🔬 DEBUGGING USER ENS for address:", userAddress);
+    
+    if (!provider) {
+      console.log("❌ No ENS provider available");
+      return null;
+    }
 
     try {
-      const cleanName = name.toLowerCase().replace(/\.eth$/, "");
-      const response = await fetch(`${API_BASE}/api/ens-cost/${cleanName}/${duration}`);
-      
-      if (!response.ok) {
-        throw new Error(`ENS cost lookup failed: ${response.status}`);
-      }
+      // Try direct lookupAddress call
+      console.log("🔍 Step 1: Direct lookupAddress call...");
+      const ensName = await provider.lookupAddress(userAddress);
+      console.log("📛 Direct lookup result:", ensName || "No ENS name found");
 
-      const data = await response.json();
-      return data.cost;
+      if (ensName) {
+        console.log("✅ ENS name found! Fetching full profile...");
+        
+        // Get resolver
+        console.log("🔧 Step 2: Getting resolver...");
+        const resolver = await provider.getResolver(ensName);
+        console.log("🔧 Resolver:", resolver ? "Found" : "Not found");
+
+        if (resolver) {
+          // Try to get avatar specifically
+          console.log("🖼️ Step 3: Getting avatar...");
+          try {
+            const avatar = await resolver.getAvatar();
+            console.log("🖼️ Avatar result:", avatar || "No avatar");
+            
+            return {
+              ensName,
+              avatar,
+              debug: "SUCCESS - ENS found and avatar fetched"
+            };
+          } catch (avatarErr) {
+            console.log("❌ Avatar fetch error:", avatarErr.message);
+            return {
+              ensName,
+              avatar: null,
+              debug: "ENS found but avatar failed"
+            };
+          }
+        } else {
+          return {
+            ensName,
+            avatar: null,
+            debug: "ENS found but no resolver"
+          };
+        }
+      } else {
+        console.log("❌ No ENS name found for this address");
+        
+        // Additional debugging - check if address is valid
+        console.log("🔍 Address validation:");
+        console.log("- Address:", userAddress);
+        console.log("- Length:", userAddress.length);
+        console.log("- Starts with 0x:", userAddress.startsWith('0x'));
+        console.log("- Is valid format:", /^0x[a-fA-F0-9]{40}$/.test(userAddress));
+        
+        return {
+          ensName: null,
+          avatar: null,
+          debug: "No ENS name found - address might not have ENS or reverse record not set"
+        };
+      }
     } catch (err) {
-      const errorMessage = err.message || "ENS cost lookup failed";
-      setError(errorMessage);
-      throw new Error(errorMessage);
-    } finally {
-      setLoading(false);
+      console.log("❌ ENS debug error:", err.message);
+      console.log("❌ Full error:", err);
+      return {
+        ensName: null,
+        avatar: null,
+        debug: `Error: ${err.message}`
+      };
     }
-  }, []);
+  }, [provider]);
 
   return {
     loading,
     error,
     lookupName,
+    lookupAddress,
     lookupProfile,
-    lookupComplete,
     checkAvailability,
     getRegistrationCost,
+    registerName, // Redirects to official ENS app
     shortenAddress,
     clearError,
-    isEthAddress
+    isEthAddress,
+    testEnsLookup, // Test function
+    debugUserEns, // Debug function for user's specific address
+    ensInitialized: true // Always true since we use ethers directly
   };
 };
 

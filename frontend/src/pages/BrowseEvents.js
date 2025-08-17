@@ -23,28 +23,10 @@ const BrowseEvents = () => {
     setIsGuestUser(!address);
   }, [address]);
 
-  // Filter events based on theme using eventType from smart contract
+  // All events are concert events now
   useEffect(() => {
-    if (!events) {
-      setFilteredEvents([]);
-      return;
-    }
-
-    const filtered = events.filter(event => {
-      // Use eventType from smart contract: 0 = Performance, 1 = Sports
-      console.log(`Event ${event.id}: ${event.metadata?.name}, eventType: ${event.eventType}, isMatcha: ${isMatcha}`);
-      
-      if (isMatcha) {
-        // Show sports events (eventType = 1) on Match-a side
-        return event.eventType === 1;
-      } else {
-        // Show performance events (eventType = 0) on Performative side
-        return event.eventType === 0;
-      }
-    });
-    
-    setFilteredEvents(filtered);
-  }, [events, isMatcha]);
+    setFilteredEvents(events || []);
+  }, [events]);
 
   const buyTicket = async (eventId, price) => {
     if (!eventContract || !address) return alert("Connect wallet first!");

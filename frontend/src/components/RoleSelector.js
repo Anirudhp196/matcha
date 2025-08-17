@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import LoadingSpinner from "./LoadingSpinner";
 import "./RoleSelector.css";
 
-const RoleSelector = ({ onSelectFan, onSelectArtist, onSelectSportsTeam }) => {
+const RoleSelector = ({ onSelectFan, onSelectArtist }) => {
   const [selecting, setSelecting] = useState(false);
   const [selectedRole, setSelectedRole] = useState(null);
   
@@ -28,7 +28,7 @@ const RoleSelector = ({ onSelectFan, onSelectArtist, onSelectSportsTeam }) => {
         <div className="role-selector-content">
           <div className="role-option fan-option">
             <h3>🎟️ Fan</h3>
-            <p className="role-description">Access both sports and music events</p>
+            <p className="role-description">Access and enjoy concert events</p>
             <button 
               className="role-button fan-button" 
               onClick={() => handleSelectRole('fan', onSelectFan)}
@@ -66,26 +66,7 @@ const RoleSelector = ({ onSelectFan, onSelectArtist, onSelectSportsTeam }) => {
             </button>
           </div>
 
-          <div className="role-divider"></div>
 
-          <div className="role-option sports-option">
-            <h3>⚽ Sports Team</h3>
-            <p className="role-description">Create and manage sports events</p>
-            <button 
-              className="role-button sports-button" 
-              onClick={() => handleSelectRole('sportsTeam', onSelectSportsTeam)}
-              disabled={selecting}
-            >
-              {selecting && selectedRole === 'sportsTeam' ? (
-                <span className="role-loading">
-                  <LoadingSpinner size="small" />
-                  <span>Setting up...</span>
-                </span>
-              ) : (
-                "Choose Sports Team"
-              )}
-            </button>
-          </div>
         </div>
       </div>
     </div>

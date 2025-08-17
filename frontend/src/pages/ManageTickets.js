@@ -26,24 +26,10 @@ const ManageTickets = () => {
 
   const isMatcha = theme === 'matcha';
 
-  // Filter tickets based on current theme
+  // All tickets are concert tickets now
   useEffect(() => {
-    if (!tickets || !tickets.length) {
-      setFilteredTickets([]);
-      return;
-    }
-
-    const filtered = tickets.filter(ticket => {
-      // EventType: 0 = Performance, 1 = Sports
-      if (isMatcha) {
-        return ticket.eventType === 1; // Show only sports tickets on Match-a side
-      } else {
-        return ticket.eventType === 0; // Show only performance tickets on Performative side
-      }
-    });
-
-    setFilteredTickets(filtered);
-  }, [tickets, isMatcha]);
+    setFilteredTickets(tickets || []);
+  }, [tickets]);
 
   useEffect(() => {
     const fetchTicketDetails = async () => {
@@ -137,7 +123,7 @@ const ManageTickets = () => {
   return (
     <div className={`manage-tickets-container theme-${theme}`}>
       <h1 className={`page-title ${isMatcha ? 'matcha' : 'performative'}`}>
-        🎟 Your {isMatcha ? 'Sports Match' : 'Concert'} Tickets
+        🎟 Your Concert Tickets
       </h1>
 
       {loading || loadingDetails ? (
@@ -146,14 +132,11 @@ const ManageTickets = () => {
         </div>
       ) : filteredTickets.length === 0 ? (
         <div className="no-tickets">
-          <p className={`glow-text ${isMatcha ? 'matcha' : 'performative'}`}>
-            No {isMatcha ? 'sports match' : 'concert'} tickets owned yet.
+          <p className="glow-text performative">
+            No concert tickets owned yet.
           </p>
           <p className="ticket-help-text">
-            Purchase {isMatcha ? 'match' : 'concert'} tickets from the events page to see them here.
-            {tickets.length > 0 && (
-              <span> You have {tickets.length - filteredTickets.length} tickets for {isMatcha ? 'concerts' : 'sports matches'} on the other side.</span>
-            )}
+            Purchase concert tickets from the events page to see them here.
           </p>
         </div>
       ) : (
