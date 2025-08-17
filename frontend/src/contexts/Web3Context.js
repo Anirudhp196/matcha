@@ -415,13 +415,8 @@ export const Web3Provider = ({ children }) => {
 
     // Attempt to resolve ENS name via the API for ANY artistAddress.
     try {
-      console.log("DEBUG: Attempting ENS lookup for artist:", artistAddress);
-      const res = await fetch(`https://9781005f3657.ngrok-free.app/api/ens-name/${artistAddress}`);
-      const data = await res.json();
-
-      if (data && data.ensName) {
-        console.log("✅ Found ENS name from API for artist:", data.ensName);
-        return data.ensName;
+      if (ensName) {
+        return ensName;
       }
     } catch (ensErr) {
       console.log("❌ ENS API lookup failed for artist:", ensErr);
