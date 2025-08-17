@@ -413,16 +413,21 @@ export const Web3Provider = ({ children }) => {
   const getArtistName = async (artistAddress) => {
     if (!artistAddress) return "Unknown Artist";
 
+    console.log("DEBUG: getArtistName called for:", artistAddress);
+    console.log("DEBUG: Current user address:", address);
+
     // Scenario 1: The artist is the currently logged-in user.
     // Use the comprehensive getDisplayName logic for the current user's address.
     if (address && artistAddress.toLowerCase() === address.toLowerCase()) {
-      return getDisplayName(); // This function already handles Privy email/ENS/shortenAddress for the current user.
+      const displayName = getDisplayName();
+      console.log("DEBUG: Artist is current user. Display name:", displayName);
+      return displayName;
     }
 
     // Scenario 2: The artist is NOT the currently logged-in user.
     // Attempt to resolve their ENS name via the API.
     try {
-      console.log("🎵 Getting artist name (ENS or address) for:", artistAddress);
+      console.log("DEBUG: Attempting ENS lookup for external artist:", artistAddress);
       const res = await fetch(`https://9781005f3657.ngrok-free.app/api/ens-name/${artistAddress}`);
       const data = await res.json();
 
