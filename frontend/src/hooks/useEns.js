@@ -10,8 +10,16 @@ export const useEns = () => {
   // Initialize provider for ENS operations (using Ethereum mainnet for ENS)
   const provider = useMemo(() => {
     try {
-      // Use a more reliable RPC endpoint
-      return new ethers.providers.JsonRpcProvider('https://cloudflare-eth.com');
+      // Use multiple reliable RPC endpoints for ENS resolution
+      const rpcEndpoints = [
+        'https://ethereum.publicnode.com', // Public Node - excellent ENS support
+        'https://rpc.ankr.com/eth', // Ankr - good backup
+        'https://cloudflare-eth.com', // Cloudflare - fallback
+      ];
+      
+      // Use the first endpoint for now, with fallback logic later if needed
+      console.log('🌐 Initializing ENS provider with:', rpcEndpoints[0]);
+      return new ethers.providers.JsonRpcProvider(rpcEndpoints[0]);
     } catch (err) {
       console.error('Failed to initialize ENS provider:', err);
       return null;
@@ -166,19 +174,44 @@ export const useEns = () => {
 
     try {
       console.log(`🔍 Checking availability for: ${cleanName}.eth`);
+      
+      // First test with a known ENS name to verify our provider works
+      try {
+        const testResolve = await provider.resolveName('vitalik.eth');
+        console.log(`🧪 Test resolution of vitalik.eth:`, testResolve);
+        if (!testResolve) {
+          console.error('❌ ENS provider test failed - vitalik.eth should resolve to an address');
+          setError('ENS service not working properly');
+          return false;
+        }
+      } catch (testErr) {
+        console.error('❌ ENS provider test failed:', testErr);
+        setError('Cannot connect to ENS service');
+        return false;
+      }
+      
+      // Now check the actual name
       const address = await provider.resolveName(`${cleanName}.eth`);
-      console.log(`📍 Resolution result:`, address);
+      console.log(`📍 Resolution result for ${cleanName}.eth:`, address);
       
       // If address exists, the name is TAKEN (not available)
       // If address is null, the name is AVAILABLE
       const isAvailable = address === null;
       console.log(`✅ ${cleanName}.eth is ${isAvailable ? 'AVAILABLE' : 'TAKEN'}`);
+      
+      if (!isAvailable && address) {
+        console.log(`👤 ${cleanName}.eth is owned by: ${address}`);
+      }
+      
       return isAvailable;
     } catch (err) {
       console.log(`❌ ENS resolution error for ${cleanName}.eth:`, err.message);
+      console.log(`📜 Full error:`, err);
+      
       // If there's a network error, we can't determine availability
       // It's safer to return false (assume taken) to avoid false positives
       console.log(`⚠️ Assuming ${cleanName}.eth is taken due to resolution error`);
+      setError(`Cannot check availability: ${err.message}`);
       return false;
     } finally {
       setLoading(false);
